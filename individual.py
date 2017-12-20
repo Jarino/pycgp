@@ -1,36 +1,15 @@
 """ Individual """
 
 from utils import split_to_chunks
-from abc import ABC
-
-
-class Node(ABC):
-    def __init__(self):
-        self.value = None
-        
-
-class InputNode(Node):
-    def __init__(self, index):
-        self.id = index
-        super().__init__()
-
-class FunctionNode(Node):
-    def __init__(self, genes):
-        self.active = False
-        self.function_index = genes[0]
-        self.inputs = genes[1:]
-        super().__init__()
-
-    def compute(self, other_nodes, funset):
-        fun = funset[self.function_index]
-        self.value = fun(*[other_nodes[x].value for x in self.inputs])
+from node import InputNode, FunctionNode
 
 
 class Individual():
 
+
     def __init__(self, genes, arity, n_inputs, n_outputs):
         self.genes = genes
-        self.n_nodes = (len(genes) - n_outputs)//(arity + 1)
+        self.n_nodes = (len(genes) - n_outputs) // (arity + 1)
 
         self.input_nodes = [InputNode(i) for i in range(n_inputs)]
 
@@ -47,7 +26,9 @@ class Individual():
 
         self._mark_active()
 
+
     def _mark_active(self):
+        """ Mark nodes which are active and need to be computed """
         stack = []
         for node_id in self.output_genes:
             stack.append(node_id)
