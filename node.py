@@ -3,6 +3,7 @@ from abc import ABC
 class Node(ABC):
     def __init__(self):
         self.value = None
+        self.upper_bound = 0
 
 
 class InputNode(Node):
@@ -22,3 +23,7 @@ class FunctionNode(Node):
     def compute(self, other_nodes, funset):
         fun = funset[self.function_index]
         self.value = fun(*[other_nodes[x].value for x in self.inputs])
+
+class OutputNode(Node):
+    def __init__(self):
+        super().__init__()

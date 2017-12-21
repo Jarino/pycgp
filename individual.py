@@ -1,14 +1,22 @@
 """ Individual """
 
 from utils import split_to_chunks
-from node import InputNode, FunctionNode
-
+from node import InputNode, FunctionNode, OutputNode
+from copy import deepcopy
 
 class Individual():
 
 
-    def __init__(self, genes, arity, n_inputs, n_outputs):
+    def __init__(self, genes, bounds, params):
+        arity = params['arity']
+        n_inputs = params['n_inputs']
+        n_outputs = params['n_outputs']
+
+        self.funset = params['funset']
+
         self.genes = genes
+        self.bounds = bounds
+
         self.n_nodes = (len(genes) - n_outputs) // (arity + 1)
 
         self.input_nodes = [InputNode(i) for i in range(n_inputs)]
@@ -20,11 +28,19 @@ class Individual():
         for _ in range(self.n_nodes):
             self.function_nodes.append(FunctionNode(next(chunks)))
 
-        self.nodes = self.input_nodes + self.function_nodes
 
         self.output_genes = genes[(arity + 1) * self.n_nodes:]
 
+        self.nodes = self.input_nodes + self.function_nodes
+
         self._mark_active()
+
+    def __len__(self):
+        return len(self.genes)
+
+    def copy(self):
+        """ Return the copy of individual for mutation """
+        return deepcopy(self)
 
 
     def _mark_active(self):
@@ -44,7 +60,7 @@ class Individual():
                 stack.append(input_id)
 
 
-    def execute(self, data, funset):
+    def execute(self, data):
         """ Execute the individual with given data """
 
         for node, value in zip(self.input_nodes, data):
@@ -52,6 +68,6 @@ class Individual():
 
         for node in self.function_nodes:
             if node.active:
-                node.compute(self.nodes, funset)
+                node.compute(self.nodes, self.funset)
 
         return [self.nodes[i].value for i in self.output_genes]

@@ -17,10 +17,12 @@ class GenotypeFactory():
 
     def create(self):
         genes = []
+        bounds = []
         for i in range(self.n_ins, self.n_ins + self.n_fun_nodes):
             function_gene = randint(0, self.n_funs - 1)
 
             genes.append(function_gene)
+            bounds.append(self.n_funs - 1)
 
             current_column = (i - self.n_ins) // self.n_rows
 
@@ -28,9 +30,11 @@ class GenotypeFactory():
 
             for _ in range(self.arity):
                 genes.append(randint(0, upper_bound))
+                bounds.append(upper_bound)
 
         output_gene_upper_bound = self.n_ins + self.n_fun_nodes - 1
         for i in range(self.n_outs):
             genes.append(randint(0, output_gene_upper_bound))
+            bounds.append(output_gene_upper_bound)
 
-        return genes
+        return genes, bounds
