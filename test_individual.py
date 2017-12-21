@@ -2,6 +2,7 @@
 
 from individual import Individual
 
+import numpy as np
 
 class TestIndividual(object):
 
@@ -25,6 +26,21 @@ class TestIndividual(object):
         output = individual.execute(input_data)
 
         assert output[0] == -92
+
+    def test_evaluation_of_multiple_instances(self, individual):
+        """ Test the evaluation of multidim input data """
+
+        input_data = [[10,8,4], [8,4,0]]
+
+        output = individual.execute(input_data)
+
+        assert output == [[-92], [-60]]
+
+        np_input_data = np.array(input_data)
+
+        output = individual.execute(np_input_data)
+
+        assert output == [[-92], [-60]]
 
 
     def test_marking_active(self, individual):

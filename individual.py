@@ -1,5 +1,5 @@
 """ Individual """
-
+import numpy as np
 from utils import split_to_chunks
 from node import InputNode, FunctionNode, OutputNode
 from copy import deepcopy
@@ -59,10 +59,7 @@ class Individual():
             for input_id in current_node.inputs:
                 stack.append(input_id)
 
-
-    def execute(self, data):
-        """ Execute the individual with given data """
-
+    def __execute_single(self, data):
         for node, value in zip(self.input_nodes, data):
             node.value = value
 
@@ -71,3 +68,14 @@ class Individual():
                 node.compute(self.nodes, self.funset)
 
         return [self.nodes[i].value for i in self.output_genes]
+
+    def __execute_many(self, data):
+        return [self.__execute_single(x) for x in data]
+        
+
+    def execute(self, data):
+        """ Execute the individual with given data """
+        if np.isscalar(data[0]):
+            return self.__execute_single(data)
+        else:
+            return self.__execute_many(data) 
