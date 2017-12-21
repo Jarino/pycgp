@@ -1,8 +1,9 @@
 """ Test suite for CGP individual """
 
+import numpy as np
+
 from individual import Individual
 
-import numpy as np
 
 class TestIndividual(object):
 
@@ -11,12 +12,10 @@ class TestIndividual(object):
 
         assert [x.id for x in individual.input_nodes] == [0, 1, 2]
 
-
     def test_n_nodes(self, individual):
         """ Test whether individual correctly computes the number of fun nodes """
 
         assert individual.n_nodes == 4
-
 
     def test_evaluation(self, individual):
         """ Test the evaluation of the individual """
@@ -30,7 +29,7 @@ class TestIndividual(object):
     def test_evaluation_of_multiple_instances(self, individual):
         """ Test the evaluation of multidim input data """
 
-        input_data = [[10,8,4], [8,4,0]]
+        input_data = [[10, 8, 4], [8, 4, 0]]
 
         output = individual.execute(input_data)
 
@@ -42,7 +41,6 @@ class TestIndividual(object):
 
         assert output == [[-92], [-60]]
 
-
     def test_marking_active(self, individual):
         """ Test whether individual correctly marks its nodes as (in)active """
 
@@ -50,3 +48,18 @@ class TestIndividual(object):
         assert not individual.nodes[4].active
         assert not individual.nodes[5].active
         assert individual.nodes[6].active
+
+    def test_active_vector(self, individual):
+        assert individual.active == [
+            1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1
+        ]
+
+    def test_mutating_the_output_gene(self, individual):
+        # lets pretend this is a random mutation
+        new_individual = individual.copy()
+        new_individual.genes[len(new_individual.genes) - 1] = 5
+
+        assert new_individual.output_genes != individual.output_genes
+
+
+

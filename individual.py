@@ -1,7 +1,7 @@
 """ Individual """
 import numpy as np
 from utils import split_to_chunks
-from node import InputNode, FunctionNode, OutputNode
+from node import InputNode, FunctionNode
 from copy import deepcopy
 
 class Individual():
@@ -10,14 +10,14 @@ class Individual():
     def __init__(self, genes, bounds, params):
         arity = params['arity']
         n_inputs = params['n_inputs']
-        n_outputs = params['n_outputs']
+        self.n_outputs = params['n_outputs']
 
         self.funset = params['funset']
 
         self.genes = genes
         self.bounds = bounds
 
-        self.n_nodes = (len(genes) - n_outputs) // (arity + 1)
+        self.n_nodes = (len(genes) - self.n_outputs) // (arity + 1)
 
         self.input_nodes = [InputNode(i) for i in range(n_inputs)]
 
@@ -28,9 +28,6 @@ class Individual():
         for _ in range(self.n_nodes):
             self.function_nodes.append(FunctionNode(next(chunks)))
 
-
-        self.output_genes = genes[(arity + 1) * self.n_nodes:]
-
         self.nodes = self.input_nodes + self.function_nodes
 
         self._mark_active()
@@ -38,6 +35,10 @@ class Individual():
     def __len__(self):
         return len(self.genes)
 
+    @property
+    def output_genes(self):
+        return self.genes[-self.n_outputs:]
+    
     def copy(self):
         """ Return the copy of individual for mutation """
         return deepcopy(self)
