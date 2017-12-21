@@ -15,7 +15,7 @@ class TestIndividual(object):
     def test_n_nodes(self, individual):
         """ Test whether individual correctly computes the number of fun nodes """
 
-        assert individual.n_nodes == 4
+        assert len(individual.function_nodes) == 4
 
     def test_evaluation(self, individual):
         """ Test the evaluation of the individual """

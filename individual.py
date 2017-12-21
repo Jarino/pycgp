@@ -17,7 +17,6 @@ class Individual():
         self.genes = genes
         self.bounds = bounds
 
-        self.n_nodes = (len(genes) - self.n_outputs) // (arity + 1)
 
         self.input_nodes = [InputNode(i) for i in range(n_inputs)]
 
@@ -25,7 +24,8 @@ class Individual():
 
         self.function_nodes = []
 
-        for _ in range(self.n_nodes):
+        n_nodes = (len(genes) - self.n_outputs) // (arity + 1)
+        for _ in range(n_nodes):
             self.function_nodes.append(FunctionNode(next(chunks)))
 
         self.nodes = self.input_nodes + self.function_nodes
