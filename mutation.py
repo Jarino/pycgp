@@ -5,7 +5,7 @@ from random import randint
 def point_mutation(individual):
     """ perform a point mutation on given individual """
 
-    index = randint(0, len(individual))
+    index = randint(0, len(individual) - 1)
 
     upper_bound = individual.bounds[index]
 

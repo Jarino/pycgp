@@ -1,11 +1,13 @@
 """ Individual """
-import numpy as np
-from utils import split_to_chunks
-from node import InputNode, FunctionNode
 from copy import deepcopy
 
-class Individual():
+import numpy as np
 
+from node import FunctionNode, InputNode
+from utils import split_to_chunks
+
+
+class Individual():
 
     def __init__(self, genes, bounds, params):
         arity = params['arity']
@@ -16,7 +18,6 @@ class Individual():
 
         self.genes = genes
         self.bounds = bounds
-
 
         self.input_nodes = [InputNode(i) for i in range(n_inputs)]
 
@@ -32,17 +33,18 @@ class Individual():
 
         self._mark_active()
 
+    
+
     def __len__(self):
         return len(self.genes)
 
     @property
     def output_genes(self):
         return self.genes[-self.n_outputs:]
-    
+
     def copy(self):
         """ Return the copy of individual for mutation """
         return deepcopy(self)
-
 
     def _mark_active(self):
         """ Mark nodes which are active and need to be computed """
@@ -72,11 +74,10 @@ class Individual():
 
     def __execute_many(self, data):
         return [self.__execute_single(x) for x in data]
-        
 
     def execute(self, data):
         """ Execute the individual with given data """
         if np.isscalar(data[0]):
             return self.__execute_single(data)
         else:
-            return self.__execute_many(data) 
+            return self.__execute_many(data)
