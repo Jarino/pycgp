@@ -1,18 +1,33 @@
+"""
+This module contains some simple default parameters to 
+"""
+
 FUNSET = {}
+
 
 def protected_div(x, y):
     if y == 0:
         return 1
-    try:
-        return x / y
-    except ZeroDivisionError:
-        return 1
+
+    return x / y
 
 
-FUNSET[0] = lambda x, y: x + y
-FUNSET[1] = lambda x, y: x - y
-FUNSET[2] = lambda x, y: x * y
-FUNSET[3] = lambda x, y: protected_div(x, y)
+def fsum(x, y):
+    return x + y
+
+
+def fdiv(x, y):
+    return x - y
+
+
+def fmul(x, y):
+    return x * y
+
+
+FUNSET[0] = fsum
+FUNSET[1] = fdiv
+FUNSET[2] = fmul
+FUNSET[3] = protected_div
 
 DEFAULT_PARAMS = {
     'n_inputs': 3,

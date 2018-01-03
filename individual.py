@@ -95,3 +95,7 @@ class Individual():
 
         self._mark_active()
 
+    def __str__(self):
+        """ Print the resulting function """
+        pass
+

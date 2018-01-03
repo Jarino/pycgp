@@ -58,4 +58,9 @@ class TestIndividual(object):
         assert new_individual.output_genes != individual.output_genes
 
 
+    def test_print(self, individual):
+        """ test printing the individual """
+
+        assert str(individual) == 'fsub(x1,fmul(x0,x0))'
+
 

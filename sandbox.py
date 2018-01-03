@@ -23,7 +23,7 @@ builder = IndividualBuilder(DEFAULT_PARAMS)
 population = [builder.build() for _ in range(0, 5)]
 prev_fitness = 0
 
-for gen in range(0, 500):
+for gen in range(0, 100):
     output = [i.execute(X) for i in population]
 
 #    pdb.set_trace()
