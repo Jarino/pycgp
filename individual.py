@@ -93,3 +93,5 @@ class Individual():
 
             self.function_nodes[index].update(chunk)
 
+        self._mark_active()
+

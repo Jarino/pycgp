@@ -1,6 +1,8 @@
 FUNSET = {}
 
 def protected_div(x, y):
+    if y == 0:
+        return 1
     try:
         return x / y
     except ZeroDivisionError:

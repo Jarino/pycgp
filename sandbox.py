@@ -28,7 +28,18 @@ for gen in range(0, 500):
 
 #    pdb.set_trace()
 
-    fitness = [mean_squared_error(Y, y_pred) for y_pred in output]
+
+    fitness = []
+    for index, y_pred in enumerate(output):
+        try:
+            fit = mean_squared_error(Y, y_pred)
+            fitness.append(fit)
+        except ValueError as e:
+            print(e)
+            pdb.set_trace()
+            pass
+
+
 
     parent, parent_fitness = truncation_selection(population, fitness, 1)[0]
 
