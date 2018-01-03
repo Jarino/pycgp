@@ -11,6 +11,7 @@ class Individual():
 
     def __init__(self, genes, bounds, params):
         arity = params['arity']
+        self.arity = arity
         n_inputs = params['n_inputs']
         self.n_outputs = params['n_outputs']
 
@@ -33,13 +34,13 @@ class Individual():
 
         self._mark_active()
 
-    
 
     def __len__(self):
         return len(self.genes)
 
     @property
     def output_genes(self):
+        """ Return the list containing output genes as list of integers """
         return self.genes[-self.n_outputs:]
 
     def copy(self):
@@ -81,3 +82,14 @@ class Individual():
             return self.__execute_single(data)
         else:
             return self.__execute_many(data)
+
+    def update(self):
+        """ Update the values in function nodes """
+
+        chunks = split_to_chunks(self.genes, self.arity + 1)
+        for index, chunk in enumerate(chunks):
+            if index == len(self.function_nodes):
+                break
+
+            self.function_nodes[index].update(chunk)
+

@@ -15,14 +15,17 @@ class InputNode(Node):
 
 class FunctionNode(Node):
     def __init__(self, genes):
-        self.active = False
-        self.function_index = genes[0]
-        self.inputs = genes[1:]
+        self.update(genes)
         super().__init__()
 
     def compute(self, other_nodes, funset):
         fun = funset[self.function_index]
         self.value = fun(*[other_nodes[x].value for x in self.inputs])
+
+    def update(self, genes):
+        self.active = False
+        self.function_index = genes[0]
+        self.inputs = genes[1:]
 
 class OutputNode(Node):
     def __init__(self):

@@ -49,10 +49,6 @@ class TestIndividual(object):
         assert not individual.nodes[5].active
         assert individual.nodes[6].active
 
-    def test_active_vector(self, individual):
-        assert individual.active == [
-            1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1
-        ]
 
     def test_mutating_the_output_gene(self, individual):
         # lets pretend this is a random mutation
