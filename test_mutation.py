@@ -36,4 +36,6 @@ def test_point_mutation(monkeypatch):
     mutated_individual = point_mutation(individual)
 
     assert mutated_individual.genes == [2, 1, 1, 2, 1, 1, 2, 2, 2, 3]
-
+    assert not mutated_individual.function_nodes[0].active
+    assert mutated_individual.function_nodes[1].active
+    assert not mutated_individual.function_nodes[2].active
