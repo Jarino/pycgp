@@ -4,9 +4,10 @@ from copy import deepcopy
 import numpy as np
 
 from mapper import map_to_phenotype
-from node import FunctionNode, InputNode
+from node import FunctionNode, InputNode, OutputNode
 from utils import split_to_chunks
-
+from graph_iterator import iterate_active_nodes
+from inspect import signature
 
 class Individual():
 
@@ -52,19 +53,8 @@ class Individual():
 
     def __mark_active(self):
         """ Mark nodes which are active and need to be computed """
-        stack = []
-        for node_id in self.output_genes:
-            stack.append(node_id)
-
-        while len(stack) > 0:
-            current_node = self.nodes[stack.pop()]
-            current_node.active = True
-
-            if type(current_node) is InputNode:
-                continue
-
-            for input_id in current_node.inputs:
-                stack.append(input_id)
+        for node in iterate_active_nodes(self):
+            node.active = True
 
     def __execute_single(self, data):
         for node, value in zip(self.input_nodes, data):
@@ -100,4 +90,22 @@ class Individual():
 
     def __str__(self):
         """ Print the resulting function """
-        pass
+        stack = []
+        for node in reversed(list(iterate_active_nodes(self))):
+
+            if isinstance(node, InputNode):
+                stack.append(str(node))
+
+            if isinstance(node, FunctionNode):
+                fun = self.params['funset'][node.function_index]
+                arity = len(signature(fun).parameters)
+                operands = reversed([stack.pop() for _ in range(0, arity)])
+                fname = fun.__name__
+                stack.append('{}({})'.format(fname, ','.join(operands)))
+        
+        return stack.pop()
+
+
+
+            
+        
