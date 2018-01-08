@@ -5,7 +5,7 @@ import numpy as np
 
 from node import FunctionNode, InputNode
 from utils import split_to_chunks
-
+from visualize import to_graph
 
 class Individual():
 
@@ -98,4 +98,5 @@ class Individual():
     def __str__(self):
         """ Print the resulting function """
         pass
+
 
