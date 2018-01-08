@@ -7,47 +7,61 @@ from node import FunctionNode, InputNode
 from utils import split_to_chunks
 from visualize import to_graph
 
+
 class Individual():
 
     def __init__(self, genes, bounds, params):
-        arity = params['arity']
-        self.arity = arity
-        n_inputs = params['n_inputs']
-        self.n_outputs = params['n_outputs']
-
-        self.funset = params['funset']
+        self.params = params
 
         self.genes = genes
         self.bounds = bounds
 
-        self.input_nodes = [InputNode(i) for i in range(n_inputs)]
+        input_nodes = [InputNode(i) for i in range(params['n_inputs'])]
 
-        chunks = split_to_chunks(genes, arity + 1)
+        chunks = split_to_chunks(genes, self.params['arity'] + 1)
 
-        self.function_nodes = []
+        function_nodes = []
 
-        n_nodes = (len(genes) - self.n_outputs) // (arity + 1)
+        n_nodes = (len(genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
+
         for _ in range(n_nodes):
-            self.function_nodes.append(FunctionNode(next(chunks)))
+            function_nodes.append(FunctionNode(next(chunks)))
 
-        self.nodes = self.input_nodes + self.function_nodes
+        self.nodes = input_nodes + function_nodes
 
-        self._mark_active()
-
+        self.__mark_active()
 
     def __len__(self):
         return len(self.genes)
 
     @property
+    def input_nodes(self):
+        return self.nodes[0:self.params['n_inputs']]
+
+    @property
+    def function_nodes(self):
+        n_inodes = self.params['n_inputs']
+        n_fnodes = len(self.genes) - \
+            self.params['n_outputs'] - self.params['n_inputs']
+        return self.nodes[n_inodes:n_inodes + n_fnodes]
+
+    @property
+    def output_nodes(self):
+        n_inodes = self.params['n_inputs']
+        n_fnodes = len(self.genes) - \
+            self.params['n_outputs'] - self.params['n_inputs']
+        return self.nodes[n_inodes + n_fnodes:]
+
+    @property
     def output_genes(self):
         """ Return the list containing output genes as list of integers """
-        return self.genes[-self.n_outputs:]
+        return self.genes[-self.params['n_outputs']:]
 
     def copy(self):
         """ Return the copy of individual for mutation """
         return deepcopy(self)
 
-    def _mark_active(self):
+    def __mark_active(self):
         """ Mark nodes which are active and need to be computed """
         stack = []
         for node_id in self.output_genes:
@@ -69,7 +83,7 @@ class Individual():
 
         for node in self.function_nodes:
             if node.active:
-                node.compute(self.nodes, self.funset)
+                node.compute(self.nodes, self.params['funset'])
 
         return [self.nodes[i].value for i in self.output_genes]
 
@@ -86,17 +100,15 @@ class Individual():
     def update(self):
         """ Update the values in function nodes """
 
-        chunks = split_to_chunks(self.genes, self.arity + 1)
+        chunks = split_to_chunks(self.genes, self.params['arity'] + 1)
         for index, chunk in enumerate(chunks):
             if index == len(self.function_nodes):
                 break
 
             self.function_nodes[index].update(chunk)
 
-        self._mark_active()
+        self.__mark_active()
 
     def __str__(self):
         """ Print the resulting function """
         pass
-
-
