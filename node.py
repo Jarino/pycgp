@@ -35,5 +35,6 @@ class FunctionNode(Node):
         self.inputs = genes[1:]
 
 class OutputNode(Node):
-    def __init__(self, index):
+    def __init__(self, index, gene):
+        self.input = gene
         super().__init__(index)

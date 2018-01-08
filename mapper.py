@@ -21,8 +21,9 @@ def map_to_phenotype(genes, n_inputs, arity, n_outputs):
         function_nodes.append(FunctionNode(index + n_inputs, next(chunks)))
 
     output_nodes = []
+    output_genes = next(chunks)
 
-    for index in range(n_outputs):
-        output_nodes.append(OutputNode(index + n_inputs + n_nodes))
+    for index, gene in zip(range(n_outputs), output_genes):
+        output_nodes.append(OutputNode(index + n_inputs + n_nodes, gene))
 
     return input_nodes + function_nodes + output_nodes

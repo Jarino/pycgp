@@ -30,13 +30,15 @@ class Individual():
     @property
     def function_nodes(self):
         n_inodes = self.params['n_inputs']
-        n_fnodes = (len(self.genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
+        n_fnodes = (len(self.genes) -
+                    self.params['n_outputs']) // (self.params['arity'] + 1)
         return self.nodes[n_inodes:n_inodes + n_fnodes]
 
     @property
     def output_nodes(self):
         n_inodes = self.params['n_inputs']
-        n_fnodes = (len(self.genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
+        n_fnodes = (len(self.genes) -
+                    self.params['n_outputs']) // (self.params['arity'] + 1)
         return self.nodes[n_inodes + n_fnodes:]
 
     @property

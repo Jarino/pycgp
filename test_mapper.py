@@ -20,5 +20,7 @@ def test_map_to_phenotype(individual):
     assert isinstance(nodes[3], FunctionNode)
     assert isinstance(nodes[7], OutputNode)
 
+    assert nodes[7].input == 6
+
 
 
