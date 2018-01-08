@@ -12,6 +12,9 @@ class InputNode(Node):
         self.id = index
         super().__init__()
 
+    def __str__(self):
+        return 'x{}'.format(self.id)
+
 
 class FunctionNode(Node):
     def __init__(self, genes):
