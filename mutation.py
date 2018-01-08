@@ -1,6 +1,7 @@
 """ Mutation operations """
 
 from random import randint
+from individual import Individual
 
 
 def point_mutation(individual):
@@ -8,12 +9,13 @@ def point_mutation(individual):
 
     index = randint(0, len(individual) - 1)
 
-    upper_bound = individual.bounds[index]
+    genes = individual.genes[:]
 
-    new_individual = individual.copy()
+    bounds = individual.bounds # this does not change 
 
-    new_individual.genes[index] = randint(0, upper_bound)
+    params = individual.params
 
-    new_individual.update()
+    genes[index] = randint(0, bounds[index])
 
-    return new_individual
+    return Individual(genes, bounds, params)
+

@@ -26,9 +26,6 @@ prev_fitness = 0
 for gen in range(0, 100):
     output = [i.execute(X) for i in population]
 
-#    pdb.set_trace()
-
-
     fitness = []
     for index, y_pred in enumerate(output):
         try:
@@ -51,6 +48,10 @@ for gen in range(0, 100):
 output = [i.execute(X) for i in population]
 
 fitness = [mean_squared_error(Y, y_pred) for y_pred in output]
+
+print('functions:')
+for ind, fit in zip(population, fitness):
+    print(ind, fit)
 
 print(fitness)
 
