@@ -1,0 +1,28 @@
+"""
+Module containing functions for genotype-phenotype mapping
+"""
+
+from node import FunctionNode, InputNode, OutputNode
+from utils import split_to_chunks
+
+
+def map_to_phenotype(genes, n_inputs, arity, n_outputs):
+    """ Map genotype to phenotype """
+
+    input_nodes = [InputNode(i) for i in range(n_inputs)]
+
+    chunks = split_to_chunks(genes, arity + 1)
+
+    function_nodes = []
+
+    n_nodes = (len(genes) - n_outputs) // (arity + 1)
+
+    for index in range(n_nodes):
+        function_nodes.append(FunctionNode(index + n_inputs, next(chunks)))
+
+    output_nodes = []
+
+    for index in range(n_outputs):
+        output_nodes.append(OutputNode(index + n_inputs + n_nodes))
+
+    return input_nodes + function_nodes + output_nodes

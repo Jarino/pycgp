@@ -3,31 +3,20 @@ from copy import deepcopy
 
 import numpy as np
 
+from mapper import map_to_phenotype
 from node import FunctionNode, InputNode
 from utils import split_to_chunks
-from visualize import to_graph
 
 
 class Individual():
 
     def __init__(self, genes, bounds, params):
         self.params = params
-
         self.genes = genes
         self.bounds = bounds
 
-        input_nodes = [InputNode(i) for i in range(params['n_inputs'])]
-
-        chunks = split_to_chunks(genes, self.params['arity'] + 1)
-
-        function_nodes = []
-
-        n_nodes = (len(genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
-
-        for _ in range(n_nodes):
-            function_nodes.append(FunctionNode(next(chunks)))
-
-        self.nodes = input_nodes + function_nodes
+        self.nodes = map_to_phenotype(
+            genes, self.params['n_inputs'], self.params['arity'], self.params['n_outputs'])
 
         self.__mark_active()
 
@@ -41,15 +30,13 @@ class Individual():
     @property
     def function_nodes(self):
         n_inodes = self.params['n_inputs']
-        n_fnodes = len(self.genes) - \
-            self.params['n_outputs'] - self.params['n_inputs']
+        n_fnodes = (len(self.genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
         return self.nodes[n_inodes:n_inodes + n_fnodes]
 
     @property
     def output_nodes(self):
         n_inodes = self.params['n_inputs']
-        n_fnodes = len(self.genes) - \
-            self.params['n_outputs'] - self.params['n_inputs']
+        n_fnodes = (len(self.genes) - self.params['n_outputs']) // (self.params['arity'] + 1)
         return self.nodes[n_inodes + n_fnodes:]
 
     @property

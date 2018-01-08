@@ -1,25 +1,29 @@
 from abc import ABC
 
 class Node(ABC):
-    def __init__(self):
+    """
+    Contains two basic attributes:
+    - id: is the index of node in phenotype of individual 
+    - value: computed value of this node (input value in case of InputNode, 
+             computed value of FunctionNode and output value of OutputNode)
+    """
+    def __init__(self, _id):
+        self.id = _id
         self.value = None
-        self.upper_bound = 0
 
 
 class InputNode(Node):
     def __init__(self, index):
-        # not really needed, occurs in test
-        self.id = index
-        super().__init__()
+        super().__init__(index)
 
     def __str__(self):
         return 'x{}'.format(self.id)
 
 
 class FunctionNode(Node):
-    def __init__(self, genes):
+    def __init__(self, index, genes):
         self.update(genes)
-        super().__init__()
+        super().__init__(index)
 
     def compute(self, other_nodes, funset):
         fun = funset[self.function_index]
@@ -31,5 +35,5 @@ class FunctionNode(Node):
         self.inputs = genes[1:]
 
 class OutputNode(Node):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, index):
+        super().__init__(index)

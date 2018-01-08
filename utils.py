@@ -13,3 +13,8 @@ def max_arity(functions):
     """ Returns the maximum arity from list of functions """
     arities = map(lambda x: len(signature(x).parameters), functions)
     return max(arities)
+
+def parse_genes(genes):
+    """ Parse genes and returns the list of nodes """
+
+    
