@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from individual import Individual
+from pycgp.individual import Individual
 
 
 class TestIndividual(object):

@@ -1,6 +1,6 @@
-from genotype_factory import GenotypeFactory
-from individual import Individual
-from utils import max_arity
+from pycgp.genotype_factory import GenotypeFactory
+from pycgp.individual import Individual
+from pycgp.utils import max_arity
 
 
 class IndividualBuilder:

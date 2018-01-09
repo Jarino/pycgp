@@ -1,6 +1,6 @@
 """ module containing iterators for graph of cgp individual """
 
-from node import FunctionNode, OutputNode
+from pycgp.node import FunctionNode, OutputNode
 
 
 def iterate_active_nodes(individual):

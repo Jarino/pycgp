@@ -1,6 +1,6 @@
 """ Test suite for individual builder class """
 
-from individual_builder import IndividualBuilder
+from pycgp.individual_builder import IndividualBuilder
 
 from math import sin
 

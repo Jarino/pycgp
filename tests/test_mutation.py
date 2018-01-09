@@ -1,7 +1,7 @@
 """ Test suite for mutation operators """
 
-from individual import Individual
-from mutation import point_mutation
+from pycgp.individual import Individual
+from pycgp.mutation import point_mutation
 import pdb
 
 def test_point_mutation(monkeypatch):
@@ -16,7 +16,7 @@ def test_point_mutation(monkeypatch):
     def mock_values():
         return next(values_generator)
 
-    monkeypatch.setattr('mutation.randint', lambda x, y:  mock_values())
+    monkeypatch.setattr('pycgp.mutation.randint', lambda x, y:  mock_values())
 
     genes = [2, 0, 1, 2, 1, 1, 2, 2, 2, 3]
     bounds = [2, 1, 1, 2, 2, 2, 2, 3, 3, 4]

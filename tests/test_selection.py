@@ -1,6 +1,6 @@
 """ Test suite for selection operators """
 
-from selection import truncation_selection
+from pycgp.selection import truncation_selection
 
 def truncation_selection(population):
     

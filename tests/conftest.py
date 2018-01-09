@@ -2,7 +2,7 @@
 
 import pytest
 
-from individual import Individual
+from pycgp.individual import Individual
 
 
 @pytest.fixture

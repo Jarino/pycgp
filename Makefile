@@ -1,2 +1,2 @@
 test:
-	pytest -s -v
+	python -m pytest -s -v

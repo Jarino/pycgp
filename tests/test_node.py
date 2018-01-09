@@ -1,4 +1,4 @@
-from node import FunctionNode
+from pycgp.node import FunctionNode
 
 class NodeMock:
     def __init__(self, value):

@@ -1,7 +1,7 @@
-from individual_builder import IndividualBuilder
-from selection import truncation_selection
-from mutation import point_mutation
-from params import DEFAULT_PARAMS
+from pycgp.individual_builder import IndividualBuilder
+from pycgp.selection import truncation_selection
+from pycgp.mutation import point_mutation
+from pycgp.params import DEFAULT_PARAMS
 
 from sklearn import datasets
 from sklearn.metrics import mean_squared_error

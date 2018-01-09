@@ -1,0 +1,20 @@
+digraph {
+	x0
+	x1
+	x2
+	f0
+	f1
+	f2
+	f3
+	o0
+	x0 -> f0
+	x0 -> f0
+	x1 -> f1
+	x1 -> f1
+	f1 -> f2
+	x2 -> f2
+	x1 -> f3
+	f0 -> f3
+	f3 -> o0
+	rankdir=LR
+}

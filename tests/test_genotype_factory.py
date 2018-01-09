@@ -1,12 +1,11 @@
 """ Test suite for genotype factory """
 
-from genotype_factory import GenotypeFactory
-
+from pycgp.genotype_factory import GenotypeFactory
 
 def test_generate(monkeypatch):
     """ test the random generation of genotypes """
 
-    monkeypatch.setattr('genotype_factory.randint', lambda x, y: y)
+    monkeypatch.setattr('pycgp.genotype_factory.randint', lambda x, y: y)
 
     n_inputs = 4
     n_outputs = 2
@@ -35,7 +34,7 @@ def test_generate(monkeypatch):
 def test_generate_2(monkeypatch):
     """ test the random generation of genotypes with different conf """
 
-    monkeypatch.setattr('genotype_factory.randint', lambda x, y: y)
+    monkeypatch.setattr('pycgp.genotype_factory.randint', lambda x, y: y)
 
     n_inputs = 3
     n_outputs = 1

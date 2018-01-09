@@ -2,8 +2,8 @@
 Test suite for mapper module
 """
 
-from mapper import map_to_phenotype
-from node import FunctionNode,OutputNode,InputNode
+from pycgp.mapper import map_to_phenotype
+from pycgp.node import FunctionNode,OutputNode,InputNode
 import pdb
 
 def test_map_to_phenotype(individual):

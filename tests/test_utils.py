@@ -1,6 +1,6 @@
 """ Test suite for general utility functions """
 
-import utils
+from pycgp import utils
 
 
 def test_evenly_list_split():

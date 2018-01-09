@@ -3,10 +3,10 @@ from copy import deepcopy
 
 import numpy as np
 
-from mapper import map_to_phenotype
-from node import FunctionNode, InputNode, OutputNode
-from utils import split_to_chunks
-from graph_iterator import iterate_active_nodes
+from pycgp.mapper import map_to_phenotype
+from pycgp.node import FunctionNode, InputNode, OutputNode
+from pycgp.utils import split_to_chunks
+from pycgp.graph_iterator import iterate_active_nodes
 from inspect import signature
 
 class Individual():

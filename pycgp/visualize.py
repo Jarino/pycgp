@@ -1,6 +1,6 @@
 import graphviz as gv
 
-from node import InputNode, FunctionNode
+from pycgp.node import InputNode, FunctionNode
 
 def to_graph(individual, output_path='individual'):
     """ visualize graph """

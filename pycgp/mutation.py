@@ -1,7 +1,8 @@
 """ Mutation operations """
 
 from random import randint
-from individual import Individual
+
+from pycgp.individual import Individual
 
 
 def point_mutation(individual):
@@ -11,11 +12,10 @@ def point_mutation(individual):
 
     genes = individual.genes[:]
 
-    bounds = individual.bounds # this does not change 
+    bounds = individual.bounds  # this does not change
 
     params = individual.params
 
     genes[index] = randint(0, bounds[index])
 
     return Individual(genes, bounds, params)
-
