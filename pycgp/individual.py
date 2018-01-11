@@ -1,13 +1,14 @@
 """ Individual """
 from copy import deepcopy
+from inspect import signature
 
 import numpy as np
 
+from pycgp.graph_iterator import iterate_active_nodes
 from pycgp.mapper import map_to_phenotype
 from pycgp.node import FunctionNode, InputNode, OutputNode
 from pycgp.utils import split_to_chunks
-from pycgp.graph_iterator import iterate_active_nodes
-from inspect import signature
+
 
 class Individual():
 
@@ -47,10 +48,6 @@ class Individual():
         """ Return the list containing output genes as list of integers """
         return self.genes[-self.params['n_outputs']:]
 
-    def copy(self):
-        """ Return the copy of individual for mutation """
-        return deepcopy(self)
-
     def __mark_active(self):
         """ Mark nodes which are active and need to be computed """
         for node in iterate_active_nodes(self):
@@ -88,6 +85,18 @@ class Individual():
 
         self.__mark_active()
 
+    def is_gene_active(self, gene_index):
+        """ Checks, whether gene at given index belongs to
+        active node or not """
+        nodes = self.function_nodes + self.output_nodes
+
+        node_index = gene_index // (self.params['arity'] + 1)
+
+        if isinstance(nodes[node_index], OutputNode):
+            return True
+
+        return nodes[node_index].active
+
     def __str__(self):
         """ Print the resulting function """
         stack = []
@@ -102,10 +111,5 @@ class Individual():
                 operands = reversed([stack.pop() for _ in range(0, arity)])
                 fname = fun.__name__
                 stack.append('{}({})'.format(fname, ','.join(operands)))
-        
+
         return stack.pop()
-
-
-
-            
-        

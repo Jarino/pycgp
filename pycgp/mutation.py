@@ -19,3 +19,22 @@ def point_mutation(individual):
     genes[index] = randint(0, bounds[index])
 
     return Individual(genes, bounds, params)
+
+
+def active_mutation(individual):
+    """ perform a 'single' mutation - mutate untile active gene is changed """
+
+    active_changed = False
+    genes = individual.genes[:]
+    bounds = individual.bounds
+    params = individual.params
+
+    while not active_changed:
+        index = randint(0, len(genes) - 1)
+        print(index, len(genes), len(bounds))
+        genes[index] = randint(0, bounds[index])
+
+        if individual.is_gene_active(index):
+            active_changed = True
+    
+    return Individual(genes, bounds, params)

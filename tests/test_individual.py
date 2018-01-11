@@ -49,13 +49,9 @@ class TestIndividual(object):
         assert not individual.nodes[5].active
         assert individual.nodes[6].active
 
-
-    def test_mutating_the_output_gene(self, individual):
-        # lets pretend this is a random mutation
-        new_individual = individual.copy()
-        new_individual.genes[len(new_individual.genes) - 1] = 5
-
-        assert new_individual.output_genes != individual.output_genes
+        assert not individual.is_gene_active(4)
+        assert individual.is_gene_active(2)
+        assert individual.is_gene_active(12)
 
 
     def test_print(self, individual):

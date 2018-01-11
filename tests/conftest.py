@@ -8,7 +8,7 @@ from pycgp.individual import Individual
 @pytest.fixture
 def individual():
     genes = [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 1, 3, 6]
-    bounds = []
+    bounds = [2, 2, 2, 2, 3, 3, 2, 4, 4, 2, 5, 5, 6]
 
     funset = {}
 
