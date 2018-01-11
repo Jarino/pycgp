@@ -31,7 +31,6 @@ def active_mutation(individual):
 
     while not active_changed:
         index = randint(0, len(genes) - 1)
-        print(index, len(genes), len(bounds))
         genes[index] = randint(0, bounds[index])
 
         if individual.is_gene_active(index):
