@@ -17,7 +17,7 @@ def test_point_mutation(monkeypatch):
     def mock_values():
         return next(values_generator)
 
-    monkeypatch.setattr('pycgp.mutation.randint', lambda x, y:  mock_values())
+    monkeypatch.setattr('pycgp.mutation.choice', lambda x:  mock_values())
 
     genes = [2, 0, 1, 2, 1, 1, 2, 2, 2, 3]
     bounds = [2, 1, 1, 2, 2, 2, 2, 3, 3, 4]
@@ -44,16 +44,16 @@ def test_point_mutation(monkeypatch):
 def test_single_mutation(individual, monkeypatch):
     """ Test for single mutation (mutate until active gene is changed) """
 
-    def mock_values_generator():
+    def v_generator():
         for v in [3, 0, 1, 1]:
             yield v
 
-    values_generator = mock_values_generator()
+    values_generator = v_generator()
 
     def mock_values():
         return next(values_generator)
 
-    monkeypatch.setattr('pycgp.mutation.randint', lambda x, y: mock_values())
+    monkeypatch.setattr('pycgp.mutation.choice', lambda x: mock_values())
 
     mutated = single_mutation(individual)
 
@@ -63,16 +63,17 @@ def test_single_mutation(individual, monkeypatch):
 def test_active_mutation(individual, monkeypatch):
     """ Test for single mutation (mutate until active gene is changed) """
 
-    def mock_values_generator():
-        for v in [3, 1, 1]:
+    
+    def v_generator():
+        for v in [1, 1]:
             yield v
 
-    values_generator = mock_values_generator()
+    values_generator = v_generator()
 
-    def mock_values():
+    def choice_mock():
         return next(values_generator)
 
-    monkeypatch.setattr('pycgp.mutation.randint', lambda x, y: mock_values())
+    monkeypatch.setattr('pycgp.mutation.choice', lambda x: choice_mock())
 
     mutated = active_mutation(individual)
 

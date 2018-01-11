@@ -10,7 +10,9 @@ name = "pypi"
 pytest = "*"
 numpy = "*"
 graphviz = "*"
+sklearn = "*"
 
 
 [dev-packages]
 
+scipy = "*"

@@ -1,6 +1,5 @@
 """ Mutation operations """
 
-from random import randint
 from random import choice
 
 from pycgp.individual import Individual
@@ -9,53 +8,65 @@ from pycgp.individual import Individual
 def point_mutation(individual):
     """ perform a point mutation on given individual """
 
-    index = randint(0, len(individual) - 1)
-
     genes = individual.genes[:]
-
     bounds = individual.bounds  # this does not change
 
-    params = individual.params
+    # handle case, when there is only one possible value
+    # of gene at certain position
+    indices = [i for i, x in enumerate(bounds) if x != 0]
+    index = choice(indices)
 
-    genes[index] = randint(0, bounds[index])
+    # construct the list of acceptable values
+    possible_values = [x for x in range(
+        0, bounds[index] + 1) if x != genes[index]]
 
-    return Individual(genes, bounds, params)
+    genes[index] = choice(possible_values)
+
+    return Individual(genes, bounds, individual.params)
 
 
 def single_mutation(individual):
-    """ perform a 'single' mutation - mutate untile active gene is changed """
+    """ perform a 'single' mutation - mutate until active gene is changed """
 
     active_changed = False
     genes = individual.genes[:]
     bounds = individual.bounds
-    params = individual.params
+    agenes = individual.active_genes
 
     while not active_changed:
-        index = randint(0, len(genes) - 1)
-        genes[index] = randint(0, bounds[index])
+        indices = [i for i, x in enumerate(bounds) if x != 0]
 
-        if individual.is_gene_active(index):
+        index = choice(indices)
+
+        possible_values = [x for x in range(0, bounds[index] + 1)
+                           if x != genes[index]]
+
+        genes[index] = choice(possible_values)
+
+        if agenes[index] == 1:
             active_changed = True
-    
-    return Individual(genes, bounds, params)
+
+    return Individual(genes, bounds, individual.params)
 
 
 def active_mutation(individual):
     """ Perform an active mutation - to-be mutated gene is chosen only
     from active genes """
 
-    active_changed = False
     genes = individual.genes[:]
     bounds = individual.bounds
-    params = individual.params
+    agenes = individual.active_genes
 
-    while not active_changed:
-        index = randint(0, len(genes) - 1)
+    # simultaneously handle genes with only one possible values
+    # and inactive genes
+    indices = [i for i, (b, a) in enumerate(
+        zip(bounds, agenes)) if b != 0 and a == 1]
 
-        if individual.is_gene_active(index):
-            active_changed = True
-            genes[index] = randint(0, bounds[index])
-    
-    return Individual(genes, bounds, params)
+    index = choice(indices)
 
-    
+    possible_values = [x for x in range(
+        0, bounds[index] + 1) if x != genes[index]]
+
+    genes[index] = choice(possible_values)
+
+    return Individual(genes, bounds, individual.params)

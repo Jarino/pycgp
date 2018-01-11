@@ -53,10 +53,10 @@ class TestIndividual(object):
         assert individual.is_gene_active(2)
         assert individual.is_gene_active(12)
 
+        assert individual.active_genes == [
+            1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
 
     def test_print(self, individual):
         """ test printing the individual """
 
         assert str(individual) == 'fsub(x1,fmul(x0,x0))'
-
-

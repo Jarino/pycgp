@@ -48,6 +48,21 @@ class Individual():
         """ Return the list containing output genes as list of integers """
         return self.genes[-self.params['n_outputs']:]
 
+    @property
+    def active_genes(self):
+        """ Return a bit array indicating, whether gene at given position
+        is active or not """
+        agenes = []
+        chunk_size = self.params['arity'] + 1
+        for fnode in self.function_nodes:
+            if fnode.active:
+                agenes = agenes + [1] * chunk_size
+            else:
+                agenes = agenes + [0] * chunk_size
+
+        agenes = agenes + [1] * self.params['n_outputs']
+        return agenes
+
     def __mark_active(self):
         """ Mark nodes which are active and need to be computed """
         for node in iterate_active_nodes(self):
