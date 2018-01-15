@@ -88,18 +88,6 @@ class Individual():
         else:
             return self.__execute_many(data)
 
-    def update(self):
-        """ Update the values in function nodes """
-
-        chunks = split_to_chunks(self.genes, self.params['arity'] + 1)
-        for index, chunk in enumerate(chunks):
-            if index == len(self.function_nodes):
-                break
-
-            self.function_nodes[index].update(chunk)
-
-        self.__mark_active()
-
     def is_gene_active(self, gene_index):
         """ Checks, whether gene at given index belongs to
         active node or not """
