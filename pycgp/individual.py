@@ -128,3 +128,13 @@ class Individual():
                 stack.append('{}({})'.format(fname, ','.join(operands)))
 
         return stack.pop()
+
+    def __eq__(self, other):
+        """
+        Check whether two individuals are the same according to their
+        phenotypes (genes of active nodes)
+        """
+        active_genes = [x * y for x, y in zip(self.active_genes, self.genes)]
+        other_active_genes = [x * y for x,
+                              y in zip(other.active_genes, other.genes)]
+        return active_genes == other_active_genes

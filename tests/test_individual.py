@@ -60,3 +60,28 @@ class TestIndividual(object):
         """ test printing the individual """
 
         assert str(individual) == 'fsub(x1,fmul(x0,x0))'
+
+    def test_equality(self, individual):
+        """ Test the equality of two individuals """
+        # create a new, same individual
+        new_same_ind = Individual(
+            individual.genes, individual.bounds, individual.params)
+
+        # create individual with modified active gene
+        mod_active_genes = individual.genes[:]
+        mod_active_genes[2] = 2
+
+        mod_act_ind = Individual(
+            mod_active_genes, individual.bounds, individual.params)
+
+        # create individual with modified inactive gene
+        mod_inact_genes = individual.genes[:]
+        mod_inact_genes[4] = 2
+
+        mod_inact_ind = Individual(
+            mod_inact_genes, individual.bounds, individual.params)
+
+        assert individual == new_same_ind
+        assert not (individual == mod_act_ind)
+        assert individual != mod_act_ind
+        assert individual == mod_inact_ind
