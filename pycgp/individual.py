@@ -11,7 +11,6 @@ from pycgp.utils import split_to_chunks
 
 
 class Individual():
-
     def __init__(self, genes, bounds, params):
         self.params = params
         self.genes = genes
@@ -19,6 +18,8 @@ class Individual():
 
         self.nodes = map_to_phenotype(
             genes, self.params['n_inputs'], self.params['arity'], self.params['n_outputs'])
+
+        self.fitness = None
 
         self.__mark_active()
 

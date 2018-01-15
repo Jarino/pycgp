@@ -23,24 +23,42 @@ builder = IndividualBuilder(DEFAULT_PARAMS)
 
 population = [builder.build() for _ in range(0, 5)]
 prev_fitness = 0
-
-for gen in range(0, 1000):
-    output = [i.execute(X) for i in population]
-
-    fitness = []
-    for index, y_pred in enumerate(output):
-        fit = mean_squared_error(y, y_pred)
-        fitness.append(fit)
+fitness_evaluations = 0
+gen = 0
+target_fitness = 0
 
 
-    parent, parent_fitness = truncation_selection(population, fitness, 1)[0]
+while fitness_evaluations < 5000:
+    gen += 1
+
+    fitness_values = []
+
+    for individual in population:
+        output = individual.execute(X)
+        if individual.fitness is None:
+            individual.fitness = mean_squared_error(y, output)
+            fitness_evaluations += 1
+
+        fitness_values.append(individual.fitness)
+
+    parent, parent_fitness = truncation_selection(population, fitness_values, 1)[0]
+
+    if parent_fitness <= target_fitness:
+        break
 
     if gen % 200 == 0:
         print(gen, parent_fitness)
 
-    population = [single_mutation(parent) for _ in range(0,4)] + [parent]
+    population = [point_mutation(parent) for _ in range(0,4)]
+
+    for individual in population:
+        if individual == parent:
+            individual.fitness = parent_fitness
+
+    population = population + [parent]
 
 print(gen, parent_fitness)
+print('Number of fitness evaluations: {}'.format(fitness_evaluations))
 
 output = [i.execute(X) for i in population]
 
