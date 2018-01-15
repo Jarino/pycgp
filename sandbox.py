@@ -52,7 +52,7 @@ while fitness_evaluations < 5000:
     population = [point_mutation(parent) for _ in range(0,4)]
 
     for individual in population:
-        if individual == parent:
+        if parent == individual:
             individual.fitness = parent_fitness
 
     population = population + [parent]

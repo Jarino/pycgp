@@ -20,6 +20,7 @@ class Individual():
             genes, self.params['n_inputs'], self.params['arity'], self.params['n_outputs'])
 
         self.fitness = None
+        self.active_genes_vector = None
 
         self.__mark_active()
 
@@ -53,6 +54,9 @@ class Individual():
     def active_genes(self):
         """ Return a bit array indicating, whether gene at given position
         is active or not """
+        if self.active_genes_vector is not None:
+            return self.active_genes_vector
+
         agenes = []
         chunk_size = self.params['arity'] + 1
         for fnode in self.function_nodes:
@@ -62,6 +66,7 @@ class Individual():
                 agenes = agenes + [0] * chunk_size
 
         agenes = agenes + [1] * self.params['n_outputs']
+        self.active_genes_vector = agenes
         return agenes
 
     def __mark_active(self):
