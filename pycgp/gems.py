@@ -1,5 +1,8 @@
 """ Module containing classes for Gems extension """
 
+from pycgp.individual import Individual
+
+
 class Gem():
     """ Class representing one gem.
     Gem is represented as triple of integers:
@@ -7,11 +10,13 @@ class Gem():
     -- original value of gene
     -- mutated value of gene
     """
-    def __init__(self, index, original, mutated):
+
+    def __init__(self, index: int, original: int, mutated: int, value: float) -> None:
         self.index = index
         self.original = original
         self.mutated = mutated
         self.digits = [index, original, mutated]
+        self.value = value
 
     def __eq__(self, other):
         same_index = self.index == other.index
@@ -22,10 +27,35 @@ class Gem():
     def __hash__(self):
         n = 0
         for d in self.digits:
-            n = 10*n + d
+            n = 10 * n + d
         return n
+
+    def __lt__(self, other):
+        return self.value > other
 
 
 class JewelleryBox():
     """ Container for existing gems """
-    
+
+    def __init__(self, max_size=5):
+        self.gems = {}
+        self.max_size = max_size
+
+    def add(self, gem: Gem) -> None:
+        """ Add gem into box """
+        if gem in self.gems:
+            print('gem already in dictionary')
+
+        self.gems[gem] = gem.value
+
+    def match(self, individual: Individual) -> Gem:
+        """ return matching gem """
+        matching = None
+        for gem, value in self.gems.items():
+            same_original = individual.genes[gem.index] == gem.original
+            larger_gain = gem.value > matching.value if matching is not None else True
+
+            if same_original and larger_gain:
+                matching = gem
+
+        return matching

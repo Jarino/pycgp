@@ -3,7 +3,7 @@
 import pytest
 
 from pycgp.individual import Individual
-
+from pycgp.gems import JewelleryBox, Gem
 
 @pytest.fixture
 def individual():
@@ -21,6 +21,7 @@ def individual():
 
     def fsub(x, y):
         return x - y
+
     funset[0] = fsum
     funset[1] = fmul
     funset[2] = fsub
@@ -29,3 +30,15 @@ def individual():
         'arity': 2, 'n_inputs': 3, 'n_outputs': 1, 'funset': funset}
 
     return Individual(genes, bounds, params)
+
+
+@pytest.fixture
+def jewellerybox():
+    box = JewelleryBox()
+
+    box.add(Gem(1, 0, 2, 4))
+    box.add(Gem(2, 3, 4, 5))
+
+    return box
+    
+
