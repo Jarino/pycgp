@@ -43,8 +43,13 @@ class JewelleryBox():
 
     def add(self, gem: Gem) -> None:
         """ Add gem into box """
-        if gem in self.gems:
-            print('gem already in dictionary')
+
+        if len(self.gems) >= self.max_size:
+            min_gem = min(self.gems.keys(), key=lambda x: x.value)
+            if min_gem.value < gem.value:
+                del self.gems[min_gem]
+            else:
+                return
 
         self.gems[gem] = gem.value
 
