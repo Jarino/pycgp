@@ -33,6 +33,11 @@ class Gem():
     def __lt__(self, other):
         return self.value > other
 
+    def apply(self, individual: Individual) -> Individual:
+        genes = individual.genes[:]
+        genes[self.index] = self.mutated
+        return Individual(genes, individual.bounds, individual.params)
+
 
 class JewelleryBox():
     """ Container for existing gems """
