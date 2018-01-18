@@ -3,6 +3,7 @@ class Counter:
 
     def __init__(self):
         self.same_as_original = 0
+        self.dict = {}
     
     @staticmethod
     def get():

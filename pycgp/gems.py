@@ -2,6 +2,32 @@
 
 from pycgp.individual import Individual
 
+from abc import ABC, abstractmethod
+
+
+class GemPheno():
+    def __init__(self, child: Individual, parent: Individual, m_index: int) -> None:
+        self.mutated = child.genes[m_index]
+        self.node_index = m_index//(child.params['arity'] + 1) + child.params['n_inputs']
+        self.gene_index = m_index
+        self.value = parent.fitness - child.fitness
+        self.genes = parent.nodes[self.node_index].genes
+        self.digits = [*self.genes, m_index, self.mutated]
+        
+
+    def __hash__(self):
+        n = 0
+        for d in self.digits:
+            n = 10 * n + d
+        return n
+
+    def apply(self, individual: Individual) -> Individual:
+        new_genes = individual.genes[:]
+        new_genes[self.gene_index] = self.mutated
+        return Individual(new_genes, individual.bounds, individual.params)
+        
+
+
 
 class Gem():
     """ Class representing one gem.
@@ -11,18 +37,13 @@ class Gem():
     -- mutated value of gene
     """
 
-    def __init__(self, index: int, original: int, mutated: int, value: float) -> None:
-        self.index = index
-        self.original = original
-        self.mutated = mutated
-        self.digits = [index, original, mutated]
-        self.value = value
+    def __init__(self, child: Individual, parent: Individual, m_index: int) -> None:
+        self.index = m_index
+        self.original = parent.genes[m_index]
+        self.mutated = child.genes[m_index]
+        self.digits = [m_index, self.original, self.mutated]
+        self.value = parent.fitness - child.fitness
 
-    def __eq__(self, other):
-        same_index = self.index == other.index
-        same_original = self.original == other.original
-        same_mutated = self.mutated == other.mutated
-        return same_index and same_original and same_mutated
 
     def __hash__(self):
         n = 0
@@ -30,21 +51,33 @@ class Gem():
             n = 10 * n + d
         return n
 
-    def __lt__(self, other):
-        return self.value > other
 
     def apply(self, individual: Individual) -> Individual:
         genes = individual.genes[:]
         genes[self.index] = self.mutated
         return Individual(genes, individual.bounds, individual.params)
 
+class MatchStrategy(ABC):
+    @abstractmethod
+    def match(self, gem, individual):
+        pass
+
+class MatchPhenotypeStrategy(MatchStrategy):
+    def match(self, gem: GemPheno, individual: Individual):
+        return individual.nodes[gem.node_index].genes == gem.genes
+
+class MatchGenotypeStrategy(MatchStrategy):
+    def match(self, gem: Gem, individual: Individual):
+        return individual.genes[gem.index] == gem.original
+            
 
 class JewelleryBox():
     """ Container for existing gems """
 
-    def __init__(self, max_size=5):
+    def __init__(self, match_strategy: MatchStrategy, max_size=5):
         self.gems = {}
         self.max_size = max_size
+        self.match_strategy = match_strategy
 
     def add(self, gem: Gem) -> None:
         """ Add gem into box """
@@ -62,7 +95,7 @@ class JewelleryBox():
         """ return matching gem """
         matching = None
         for gem, value in self.gems.items():
-            same_original = individual.genes[gem.index] == gem.original
+            same_original = self.match_strategy.match(gem, individual)
             larger_gain = gem.value > matching.value if matching is not None else True
 
             if same_original and larger_gain:

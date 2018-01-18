@@ -23,6 +23,7 @@ class InputNode(Node):
 class FunctionNode(Node):
     def __init__(self, index, genes):
         self.update(genes)
+        self.genes = genes
         super().__init__(index)
 
     def compute(self, other_nodes, funset):
@@ -37,4 +38,5 @@ class FunctionNode(Node):
 class OutputNode(Node):
     def __init__(self, index, gene):
         self.input = gene
+        self.genes = [gene]
         super().__init__(index)
