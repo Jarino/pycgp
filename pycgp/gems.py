@@ -27,6 +27,28 @@ class GemPheno():
         return Individual(new_genes, individual.bounds, individual.params)
         
 
+class GemSM():
+    """ Class representing gem for single mutation """
+
+    def __init__(self, child: Individual, parent: Individual, m_indices: list) -> None:
+        self.m_indices = m_indices
+        self.originals = [parent.genes[i] for i in m_indices]
+        self.mutated = [child.genes[i] for i in m_indices]
+        self.digits = [*m_indices, *self.originals]
+        self.value = parent.fitness - child.fitness
+    
+    def __hash__(self):
+        n = 0
+        for d in self.digits:
+            n = 10 * n + d
+        return n
+
+    def apply(self, individual: Individual) -> Individual:
+        genes = individual.genes[:]
+        for m_index, mutated in zip(self.m_indices, self.mutated):
+            genes[m_index] = mutated
+        return Individual(genes, individual.bounds, individual.params)
+        
 
 
 class Gem():
@@ -71,7 +93,13 @@ class MatchPhenotypeStrategy(MatchStrategy):
 class MatchGenotypeStrategy(MatchStrategy):
     def match(self, gem: Gem, individual: Individual):
         return individual.genes[gem.index] == gem.original
-            
+
+class MatchSMStrategy(MatchStrategy):
+    def match(self, gem: GemSM, individual: Individual) -> bool:
+        for m_index, original in zip(gem.m_indices, gem.originals):
+            if individual.genes[m_index] != original:
+                return False
+        return True
 
 class JewelleryBox():
     """ Container for existing gems """

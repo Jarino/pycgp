@@ -32,11 +32,14 @@ def single_mutation(individual):
     genes = individual.genes[:]
     bounds = individual.bounds
     agenes = individual.active_genes
+    changed_indices = []
 
     while not active_changed:
         indices = [i for i, x in enumerate(bounds) if x != 0]
 
         index = choice(indices)
+
+        changed_indices.append(index)
 
         possible_values = [x for x in range(0, bounds[index] + 1)
                            if x != genes[index]]
@@ -46,7 +49,7 @@ def single_mutation(individual):
         if agenes[index] == 1:
             active_changed = True
 
-    return Individual(genes, bounds, individual.params)
+    return Individual(genes, bounds, individual.params), changed_indices
 
 
 def active_mutation(individual):
@@ -69,4 +72,4 @@ def active_mutation(individual):
 
     genes[index] = choice(possible_values)
 
-    return Individual(genes, bounds, individual.params)
+    return Individual(genes, bounds, individual.params), index
