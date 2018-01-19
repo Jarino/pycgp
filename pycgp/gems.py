@@ -53,6 +53,8 @@ class Gem():
 
 
     def apply(self, individual: Individual) -> Individual:
+        if individual.active_genes[self.index] == 0:
+            return None
         genes = individual.genes[:]
         genes[self.index] = self.mutated
         return Individual(genes, individual.bounds, individual.params)

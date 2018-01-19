@@ -43,6 +43,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         evaluations_counter += 1
    
     Counter.get().dict['gens'] = 0
+    Counter.get().dict['g_same_as_parent'] = 0
     gens = 0
     while evaluations_counter < ev_params.get('max_evaluations', 5000):
         gens += 1
@@ -85,14 +86,19 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                 matching_gem = j_box.match(individual)
                 if matching_gem is not None:
                     new_individual = matching_gem.apply(individual)
-                    # recalculate fitness
+
+                    if new_individual is None:
+                        Counter.get().dict['g_same_as_parent'] += 1
+                        continue
+
                     new_individual.fitness = cost_func(y, new_individual.execute(X))
+                    evaluations_counter += 1 
+
                     if new_individual.fitness < individual.fitness:
                         Counter.get().dict['g_better'] += 1
                         population[index] = new_individual
                     else:
                         Counter.get().dict['g_worse'] += 1
-                    evaluations_counter += 1 
 
         population = population + [parent]
 
