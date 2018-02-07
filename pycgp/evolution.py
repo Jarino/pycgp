@@ -4,6 +4,8 @@ from pycgp.selection import truncation_selection
 from pycgp.mutation import point_mutation
 from pycgp.counter import Counter
 
+import statistics
+
 from pdb import set_trace
 
 def evolution(cgp_params, ev_params, X, y, verbose=False):
@@ -34,6 +36,8 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     evaluations_counter = 0
     Counter.get().dict['g_better'] = 0
     Counter.get().dict['g_worse'] = 0
+    Counter.get().dict['mean'] = []
+    Counter.get().dict['best'] = []
 
     j_box = JewelleryBox(match_strategy(), max_size=ev_params.get('j_box_size', 5))
 
@@ -48,6 +52,16 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     while evaluations_counter < ev_params.get('max_evaluations', 5000):
         gens += 1
         #set_trace()
+        # store mean of population and best
+        Counter.get().dict['mean'].append(statistics.mean(
+            [x.fitness for x in population]
+        ))
+        Counter.get().dict['best'].append(min(
+            population, key=lambda x: x.fitness
+        ).fitness)
+
+
+
         parent = selection(population, 1)[0]
 
         if parent.fitness <= ev_params['target_fitness']:
@@ -91,14 +105,18 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         Counter.get().dict['g_same_as_parent'] += 1
                         continue
 
-                    new_individual.fitness = cost_func(y, new_individual.execute(X))
-                    evaluations_counter += 1 
+                    #new_individual.fitness = cost_func(y, new_individual.execute(X))
+                    new_individual.fitness = individual.fitness
 
-                    if new_individual.fitness < individual.fitness:
-                        Counter.get().dict['g_better'] += 1
-                        population[index] = new_individual
-                    else:
-                        Counter.get().dict['g_worse'] += 1
+                    #evaluations_counter += 1 
+                    
+                    population[index] = new_individual
+
+                    #if new_individual.fitness < individual.fitness:
+                    #    Counter.get().dict['g_better'] += 1
+                    #    population[index] = new_individual
+                    #else:
+                    #    Counter.get().dict['g_worse'] += 1
 
         population = population + [parent]
 

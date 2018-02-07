@@ -28,12 +28,12 @@ def test_point_mutation(monkeypatch):
         'arity': 2,
         'funset': {}})
 
-    mutated_individual = point_mutation(individual)
+    mutated_individual, _ = point_mutation(individual)
 
     assert mutated_individual.genes == [1, 0, 1, 2, 1, 1, 2, 2, 2, 3]
     assert mutated_individual.function_nodes[0].function_index == 1
 
-    mutated_individual = point_mutation(individual)
+    mutated_individual, _ = point_mutation(individual)
 
     assert mutated_individual.genes == [2, 1, 1, 2, 1, 1, 2, 2, 2, 3]
     assert not mutated_individual.function_nodes[0].active
@@ -55,7 +55,7 @@ def test_single_mutation(individual, monkeypatch):
 
     monkeypatch.setattr('pycgp.mutation.choice', lambda x: mock_values())
 
-    mutated = single_mutation(individual)
+    mutated, _ = single_mutation(individual)
 
     assert mutated.genes == [1, 1, 0, 0, 1, 1, 0, 4, 2, 2, 1, 3, 6]
 
@@ -75,6 +75,6 @@ def test_active_mutation(individual, monkeypatch):
 
     monkeypatch.setattr('pycgp.mutation.choice', lambda x: choice_mock())
 
-    mutated = active_mutation(individual)
+    mutated, _ = active_mutation(individual)
 
     assert mutated.genes == [1, 1, 0, 1, 1, 1, 0, 4, 2, 2, 1, 3, 6]

@@ -5,11 +5,11 @@ Module containing functions for genotype-phenotype mapping
 from pycgp.node import FunctionNode, InputNode, OutputNode
 from pycgp.utils import split_to_chunks
 
+import numpy as np
 
 
 def map_to_phenotype(genes, n_inputs, arity, n_outputs):
     """ Map genotype to phenotype """
-
     input_nodes = [InputNode(i) for i in range(n_inputs)]
 
     chunks = split_to_chunks(genes, arity + 1)
@@ -28,3 +28,6 @@ def map_to_phenotype(genes, n_inputs, arity, n_outputs):
         output_nodes.append(OutputNode(index + n_inputs + n_nodes, gene))
 
     return input_nodes + function_nodes + output_nodes
+
+    
+

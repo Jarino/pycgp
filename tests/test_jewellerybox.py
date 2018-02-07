@@ -1,38 +1,36 @@
 """ Test suite for jewellery box """
 
-from pycgp.gems import Gem, JewelleryBox
+from pycgp.gems import GemPM, JewelleryBox
 from pycgp.individual import Individual
-
+import pdb
 def test_match(jewellerybox: JewelleryBox, individual: Individual):
     """ Should return matching gem """
 
     matching_gem = jewellerybox.match(individual)
 
-    assert hash(matching_gem) == 102
+    assert hash(matching_gem) == 1015
 
 
-def test_add_to_full(jewellerybox: JewelleryBox):
+def test_add_to_full(individual: Individual, jewellerybox: JewelleryBox):
     """ Should replace the gem with least value """
 
-    # first we need to fill it up, default max size is 5
+    # there are already two individuals in jewellerybox (from conftest.py)
+    jewellerybox.max_size = 2
 
-    jewellerybox.add(Gem(1, 0, 1, 10))
-    jewellerybox.add(Gem(1, 1, 0, 9))
-    jewellerybox.add(Gem(0, 1, 1, 2))
+    # individual fixture has no fitness
+    individual.fitness = 100
 
     # get the smallest
     min_value = min(jewellerybox.gems.values())
-    assert min_value == 2
-
+    assert min_value == 5
+    
     # add another
-    new_gem = Gem(0, 0, 1, 8)
+    better_ind = Individual(individual.genes[:], individual.bounds, individual.params)
+    better_ind.fitness = 30 
+    new_gem = GemPM(better_ind, individual, 7)
     jewellerybox.add(new_gem)
 
     min_value = min(jewellerybox.gems.values())
-    assert min_value == 4
+    assert min_value ==  10
 
-    jewellerybox.add(Gem(0, 0, 0, 1))
-    
-    min_value = min(jewellerybox.gems.values())
-    assert min_value == 4
     

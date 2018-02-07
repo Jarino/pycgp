@@ -1,9 +1,9 @@
 """ test for individual iterators """
 
-import pycgp.graph_iterator as gi
+from pycgp.graph_iterator import iterate_active_nodes 
 
 def test_iterate_active_nodes(individual):
-    iterator = gi.iterate_active_nodes(individual)
+    iterator = iterate_active_nodes(individual)
 
     visited_ids = [x.id for x in iterator]
 
