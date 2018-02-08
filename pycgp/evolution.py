@@ -1,5 +1,5 @@
 from pycgp.individual_builder import IndividualBuilder
-from pycgp.gems import JewelleryBox, Gem, GemPheno, MatchGenotypeStrategy
+from pycgp.gems import JewelleryBox, GemPM, MatchPMStrategy
 from pycgp.selection import truncation_selection
 from pycgp.mutation import point_mutation
 from pycgp.counter import Counter
@@ -28,8 +28,8 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     pop_size = ev_params.get('pop', 5)
     apply_gem = ev_params.get('gems', False)
     cost_func = ev_params['cost_func']
-    gem_type = ev_params.get('gem_type', Gem)
-    match_strategy = ev_params.get('match_strategy', MatchGenotypeStrategy)
+    gem_type = ev_params.get('gem_type', GemPM)
+    match_strategy = ev_params.get('match_strategy', MatchPMStrategy)
 
 
     population = [builder.build() for _ in range(0, pop_size)]
