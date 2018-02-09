@@ -17,4 +17,4 @@ make test
 
 TODO
 
-For now, see [example notebook](https://github.com/Jarino/pycgp-notebooks/blob/master/Symbolic%20regression.ipynb).
+For now, see [example notebooks](https://github.com/Jarino/pycgp-notebooks).
