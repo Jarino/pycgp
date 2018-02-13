@@ -10,7 +10,7 @@ class Node(ABC):
     def __init__(self, _id):
         self.id = _id
         self.value = None
-
+    
 
 class InputNode(Node):
     def __init__(self, index):
@@ -18,6 +18,10 @@ class InputNode(Node):
 
     def __str__(self):
         return 'x{}'.format(self.id)
+
+    @property
+    def inputs(self):
+        return []
 
 
 class FunctionNode(Node):
@@ -35,8 +39,14 @@ class FunctionNode(Node):
         self.function_index = genes[0]
         self.inputs = genes[1:]
 
+        
+
 class OutputNode(Node):
     def __init__(self, index, gene):
         self.input = gene
         self.genes = [gene]
         super().__init__(index)
+
+    @property
+    def inputs(self):
+        return [self.input]

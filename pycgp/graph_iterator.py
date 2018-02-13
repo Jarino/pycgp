@@ -18,9 +18,8 @@ def iterate_active_nodes(individual):
 
         yield current_node
 
-        if isinstance(current_node, FunctionNode):
-            for input_id in current_node.inputs:
-                stack.append(individual.nodes[input_id])
+        for input_id in current_node.inputs:
+            stack.append(individual.nodes[input_id])
 
-        if isinstance(current_node, OutputNode):
-            stack.append(individual.nodes[current_node.input])
+
+
