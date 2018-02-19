@@ -1,6 +1,8 @@
 """ Module containing classes for Gems extension """
 
 from pycgp.individual import Individual
+from pycgp.counter import Counter
+
 
 from abc import ABC, abstractmethod
 

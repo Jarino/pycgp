@@ -51,7 +51,6 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     gens = 0
     while evaluations_counter < ev_params.get('max_evaluations', 5000):
         gens += 1
-        #set_trace()
         # store mean of population and best
         Counter.get().dict['mean'].append(statistics.mean(
             [x.fitness for x in population]
@@ -77,10 +76,6 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
             if parent == individual:
                 individual.fitness = parent.fitness
             else:
-                # place the gem application here?
-                # then it wouldn't be necessary to evaluate individual twice
-                # on the other hand, it also would not be possible to 
-                # store the gem, because we need to compute the fitness gain
                 output = individual.execute(X)
                 individual.fitness = cost_func(y, output)
                 evaluations_counter += 1
@@ -103,20 +98,19 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
 
                     if new_individual is None:
                         Counter.get().dict['g_same_as_parent'] += 1
-                        continue
-
-                    #new_individual.fitness = cost_func(y, new_individual.execute(X))
-                    new_individual.fitness = individual.fitness
-
-                    #evaluations_counter += 1 
+                        new_individual.fitness = individual.fitness
+                    else:
+                        new_individual.fitness = cost_func(y, new_individual.execute(X))
+                        evaluations_counter += 1 
+                        
+                        if new_individual.fitness < individual.fitness:
+                            Counter.get().dict['g_better'] += 1
+                            population[index] = new_individual
+                        else:
+                            Counter.get().dict['g_worse'] += 1
                     
                     population[index] = new_individual
 
-                    #if new_individual.fitness < individual.fitness:
-                    #    Counter.get().dict['g_better'] += 1
-                    #    population[index] = new_individual
-                    #else:
-                    #    Counter.get().dict['g_worse'] += 1
 
         population = population + [parent]
 
