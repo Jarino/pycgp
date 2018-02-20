@@ -1,12 +1,11 @@
 from pycgp.individual_builder import IndividualBuilder
 from pycgp.gems import JewelleryBox, GemPM, MatchPMStrategy
 from pycgp.selection import truncation_selection
-from pycgp.mutation import point_mutation
+from pycgp.mutation import point_mutation, probabilistic_mutation
 from pycgp.counter import Counter
 
 import statistics
 
-from pdb import set_trace
 
 def evolution(cgp_params, ev_params, X, y, verbose=False):
     """
@@ -21,6 +20,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     - mutation: callable, mutation operator
     - match_strategy
     - gem_type
+    - mutation_probability: float (0,1), probability of mutating a single gene, used only with probablisitic mutation
     """
     builder = IndividualBuilder(cgp_params)
     mutation = ev_params.get('mutation', point_mutation)
@@ -30,7 +30,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     cost_func = ev_params['cost_func']
     gem_type = ev_params.get('gem_type', GemPM)
     match_strategy = ev_params.get('match_strategy', MatchPMStrategy)
-
+    mutation_probability = ev_params.get('mutation_probability', 0.25)
 
     population = [builder.build() for _ in range(0, pop_size)]
     evaluations_counter = 0
@@ -69,7 +69,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         population = []
         m_indices = []
         for _ in range(0, pop_size - 1):
-            individual, mutated_index = mutation(parent)
+            individual, mutated_index = mutation(parent, mutation_probability)
             population.append(individual)
             m_indices.append(mutated_index)
 

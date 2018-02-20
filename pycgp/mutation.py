@@ -5,7 +5,7 @@ from random import choice, random
 from pycgp.individual import Individual
 
 
-def point_mutation(individual):
+def point_mutation(individual, _=None):
     """ perform a point mutation on given individual """
 
     genes = individual.genes[:]
@@ -25,7 +25,7 @@ def point_mutation(individual):
     return Individual(genes, bounds, individual.params), index
 
 
-def single_mutation(individual):
+def single_mutation(individual, _=None):
     """ perform a 'single' mutation - mutate until active gene is changed """
 
     active_changed = False
@@ -52,7 +52,7 @@ def single_mutation(individual):
     return Individual(genes, bounds, individual.params), changed_indices
 
 
-def active_mutation(individual):
+def active_mutation(individual, _=None):
     """ Perform an active mutation - to-be mutated gene is chosen only
     from active genes """
 
@@ -75,7 +75,7 @@ def active_mutation(individual):
     return Individual(genes, bounds, individual.params), index
 
 
-def probabilistic_mutation(individual, rate):
+def probabilistic_mutation(individual, rate=0.25):
     """ Perform a probabilistic mutation - at each gene position there is a
     chance it will mutate """
     
@@ -86,8 +86,10 @@ def probabilistic_mutation(individual, rate):
     for index in range(0, len(genes)):
         chance = random()
         if chance < rate:
-            changed_indices.append(index)
             possible_values = [x for x in range(0, bounds[index] + 1)
                     if x != genes[index]]
+            if len(possible_values) == 0:
+                continue
+            changed_indices.append(index)
             genes[index] = choice(possible_values)
     return Individual(genes, bounds, individual.params), changed_indices
