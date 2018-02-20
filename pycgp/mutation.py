@@ -1,6 +1,6 @@
 """ Mutation operations """
 
-from random import choice
+from random import choice, random
 
 from pycgp.individual import Individual
 
@@ -73,3 +73,21 @@ def active_mutation(individual):
     genes[index] = choice(possible_values)
 
     return Individual(genes, bounds, individual.params), index
+
+
+def probabilistic_mutation(individual, rate):
+    """ Perform a probabilistic mutation - at each gene position there is a
+    chance it will mutate """
+    
+    genes = individual.genes[:]
+    bounds = individual.bounds
+    changed_indices = []
+
+    for index in range(0, len(genes)):
+        chance = random()
+        if chance < rate:
+            changed_indices.append(index)
+            possible_values = [x for x in range(0, bounds[index] + 1)
+                    if x != genes[index]]
+            genes[index] = choice(possible_values)
+    return Individual(genes, bounds, individual.params), changed_indices
