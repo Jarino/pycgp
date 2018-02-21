@@ -5,7 +5,7 @@ from pycgp.mutation import point_mutation, probabilistic_mutation
 from pycgp.counter import Counter
 
 import statistics
-
+import pdb
 
 def evolution(cgp_params, ev_params, X, y, verbose=False):
     """
