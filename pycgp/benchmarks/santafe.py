@@ -3,6 +3,7 @@ from abc import ABC
 from random import choice
 from functools import partial
 from copy import deepcopy
+import pkg_resources
 
 def parse_matrix(f):
     matrix = []
@@ -108,7 +109,9 @@ def prog2(opt1, opt2, _):
 def prog3(opt1, opt2, opt3):
     return partial(progn, opt1, opt2, opt3)
 
-with open('pycgp/benchmarks/santafe_trail.txt') as f:
+path_to_file = pkg_resources.resource_filename('pycgp', 'benchmarks/santafe_trail.txt')
+#path_to_file = 'pycgp/benchmarks/santafe_trail.txt'
+with open(path_to_file) as f:
     matrix, position = parse_matrix(f)
 simulator = AntSimulator(matrix, position, 1)
 

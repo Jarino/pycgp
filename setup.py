@@ -6,4 +6,6 @@ setup(
     description='CGP library',
     author='Jaroslav Loebl',
     author_email='jaroslavloebl@gmail.com',
-    packages=['pycgp'])
+    packages=['pycgp'],
+    package_data={'pycgp': ['benchmarks/*.txt']}
+)
