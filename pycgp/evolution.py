@@ -98,7 +98,6 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
 
                     if new_individual is None:
                         Counter.get().dict['g_same_as_parent'] += 1
-                        new_individual.fitness = individual.fitness
                     else:
                         new_individual.fitness = cost_func(y, new_individual.execute(X))
                         evaluations_counter += 1 
