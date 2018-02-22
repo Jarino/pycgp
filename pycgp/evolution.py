@@ -108,7 +108,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         else:
                             Counter.get().dict['g_worse'] += 1
                     
-                    population[index] = new_individual
+                        population[index] = new_individual
 
 
         population = population + [parent]
