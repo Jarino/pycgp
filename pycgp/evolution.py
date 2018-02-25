@@ -26,11 +26,12 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     mutation = ev_params.get('mutation', point_mutation)
     selection = ev_params.get('selection', truncation_selection)
     pop_size = ev_params.get('pop', 5)
-    apply_gem = ev_params.get('gems', False)
+    apply_gem = ev_params.get('gems', 0)
     cost_func = ev_params['cost_func']
     gem_type = ev_params.get('gem_type', GemPM)
     match_strategy = ev_params.get('match_strategy', MatchPMStrategy)
     mutation_probability = ev_params.get('mutation_probability', 0.25)
+    expire_gems = ev_params.get('expire_gems', 0)
 
     population = [builder.build() for _ in range(0, pop_size)]
     evaluations_counter = 0
@@ -38,8 +39,10 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     Counter.get().dict['g_worse'] = 0
     Counter.get().dict['mean'] = []
     Counter.get().dict['best'] = []
+    Counter.get().dict['g_better_fitness'] = []
+    Counter.get().dict['remove_gem'] = 0
 
-    j_box = JewelleryBox(match_strategy(), max_size=ev_params.get('j_box_size', 5))
+    j_box = JewelleryBox(match_strategy(), max_size=apply_gem)
 
     for individual in population:
         output = individual.execute(X)
@@ -89,6 +92,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
 
         for index, (individual, m_index) in enumerate(zip(population, m_indices)):
             if individual.fitness < parent.fitness:
+                Counter.get().dict['g_better_fitness'].append(individual.fitness - parent.fitness)
                 j_box.add(gem_type(individual, parent, m_index))
             else:
                 # apply gem
@@ -99,6 +103,10 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                     if new_individual is None:
                         Counter.get().dict['g_same_as_parent'] += 1
                     else:
+                        # if gem exceeds 30 uses, remove
+                        if expire_gems and matching_gem.n_uses >= expire_gems:
+                            j_box.remove(matching_gem)
+
                         new_individual.fitness = cost_func(y, new_individual.execute(X))
                         evaluations_counter += 1 
                         

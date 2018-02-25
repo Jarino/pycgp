@@ -44,9 +44,11 @@ class GemSM(Gem):
         self.mutated = [child.genes[i] for i in m_indices]
         self.digits = [*m_indices, *self.originals]
         self.value = parent.fitness - child.fitness
+        self.n_uses = 0
     
 
     def apply(self, individual: Individual) -> Individual:
+        self.n_uses += 1
         genes = individual.genes[:]
         for m_index, mutated in zip(self.m_indices, self.mutated):
             genes[m_index] = mutated
@@ -68,12 +70,14 @@ class GemPM(Gem):
         self.mutated = child.genes[m_index]
         self.digits = [m_index, self.original, self.mutated]
         self.value = parent.fitness - child.fitness
+        self.n_uses = 0
 
 
 
     def apply(self, individual: Individual) -> Individual:
         if individual.active_genes[self.index] == 0:
             return None
+        self.n_uses += 1
         genes = individual.genes[:]
         genes[self.index] = self.mutated
         return Individual(genes, individual.bounds, individual.params)

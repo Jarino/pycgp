@@ -1,7 +1,8 @@
 from pycgp.gems import MatchStrategy
 from pycgp.individual import Individual
 from pycgp.gems import Gem
-
+from pycgp.counter import Counter
+import pdb
 
 class JewelleryBox():
     """ Container for existing gems """
@@ -34,3 +35,10 @@ class JewelleryBox():
                 matching = gem
 
         return matching
+
+    def remove(self, gem: Gem):
+        # get index of matching gem
+        Counter.get().dict['remove_gem'] += 1
+        del self.gems[gem]
+
+
