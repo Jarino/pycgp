@@ -33,6 +33,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     mutation_probability = ev_params.get('mutation_probability', 0.25)
     expire_gems = ev_params.get('expire_gems', 0)
 
+
     population = [builder.build() for _ in range(0, pop_size)]
     evaluations_counter = 0
     Counter.get().dict['g_better'] = 0
