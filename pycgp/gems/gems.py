@@ -35,7 +35,7 @@ class GemPheno(Gem):
         return Individual(new_genes, individual.bounds, individual.params)
         
 
-class GemSM(Gem):
+class GemMultipleGenes(Gem):
     """ Class representing gem for single mutation """
 
     def __init__(self, child: Individual, parent: Individual, m_indices: list) -> None:
@@ -56,7 +56,7 @@ class GemSM(Gem):
         
 
 
-class GemPM(Gem):
+class GemSingleGene(Gem):
     """ Class representing one gem.
     Gem is represented as triple of integers:
     -- index in genotype

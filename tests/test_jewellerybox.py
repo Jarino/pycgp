@@ -1,6 +1,6 @@
 """ Test suite for jewellery box """
 
-from pycgp.gems import GemPM, JewelleryBox
+from pycgp.gems import GemSingleGene, JewelleryBox
 from pycgp.individual import Individual
 import pdb
 def test_match(jewellerybox: JewelleryBox, individual: Individual):
@@ -27,7 +27,7 @@ def test_add_to_full(individual: Individual, jewellerybox: JewelleryBox):
     # add another
     better_ind = Individual(individual.genes[:], individual.bounds, individual.params)
     better_ind.fitness = 30 
-    new_gem = GemPM(better_ind, individual, 7)
+    new_gem = GemSingleGene(better_ind, individual, 7)
     jewellerybox.add(new_gem)
 
     min_value = min(jewellerybox.gems.values())

@@ -6,7 +6,7 @@ def test_evolution():
     # first import everything important
     from pycgp.evolution import evolution
     from pycgp.mutation import single_mutation
-    from pycgp.gems import GemSM, MatchSMStrategy
+    from pycgp.gems import GemMultipleGenes, MatchSMStrategy
     from pycgp.counter import Counter
     from pycgp.params import DEFAULT_PARAMS
 

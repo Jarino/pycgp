@@ -3,7 +3,7 @@
 import pytest
 
 from pycgp.individual import Individual
-from pycgp.gems import JewelleryBox, GemPM, MatchPMStrategy
+from pycgp.gems import JewelleryBox, GemSingleGene, MatchPMStrategy
 
 
 funset = {}
@@ -48,8 +48,8 @@ def jewellerybox():
     mutated_1.fitness = 95
     mutated_2.fitness = 90
     parent.fitness = 100
-    box.add(GemPM(mutated_1, parent, 4))
-    box.add(GemPM(mutated_2, parent, 10))
+    box.add(GemSingleGene(mutated_1, parent, 4))
+    box.add(GemSingleGene(mutated_2, parent, 10))
 
     return box
     
