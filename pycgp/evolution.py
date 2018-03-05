@@ -7,6 +7,9 @@ from pycgp.counter import Counter
 import statistics
 import pdb
 
+from pycgp.individual import Individual
+
+
 def evolution(cgp_params, ev_params, X, y, verbose=False):
     """
     ev_params fields:
@@ -34,6 +37,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     expire_gems = ev_params.get('expire_gems', 0)
 
 
+
     population = [builder.build() for _ in range(0, pop_size)]
     evaluations_counter = 0
     Counter.get().dict['g_better'] = 0
@@ -42,6 +46,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     Counter.get().dict['best'] = []
     Counter.get().dict['g_better_fitness'] = []
     Counter.get().dict['remove_gem'] = 0
+    Counter.get().dict['best_individual'] = []
 
     j_box = JewelleryBox(match_strategy(), max_size=apply_gem)
 
@@ -64,8 +69,8 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         ).fitness)
 
 
-
         parent = selection(population, 1)[0]
+        Counter.get().dict['best_individual'].append(parent)
 
         if parent.fitness <= ev_params['target_fitness']:
             break
