@@ -22,13 +22,6 @@ def parse_matrix(f):
                 start_y = i
     return matrix, (start_x, start_y)
 
-def check_number_of_moves(method):
-    def inner(simulator, *args):
-        if simulator.moves >= simulator.max_moves:
-            raise ValueError
-        else:
-            method(simulator, *args)
-    return inner
 
 class AntSimulator():
     def __init__(self,matrix, start_position, direction=0, max_moves=600):
@@ -51,7 +44,6 @@ class AntSimulator():
         self.eaten = 0
         self.start_direction = direction
     
-#    @check_number_of_moves
     def move(self):
         self.moves += 1
         self.pos_columns = (
@@ -64,12 +56,10 @@ class AntSimulator():
             self.eaten += 1
             self.matrix[self.pos_rows][self.pos_columns] = 0
 
-#    @check_number_of_moves
     def turn_left(self):
         self.moves += 1
         self.direction = (self.direction - 1) % 4
 
-#    @check_number_of_moves
     def turn_right(self):
         self.moves += 1
         self.direction = (self.direction + 1) % 4
@@ -110,7 +100,6 @@ def prog3(opt1, opt2, opt3):
     return partial(progn, opt1, opt2, opt3)
 
 path_to_file = pkg_resources.resource_filename('pycgp', 'benchmarks/santafe_trail.txt')
-#path_to_file = 'pycgp/benchmarks/santafe_trail.txt'
 with open(path_to_file) as f:
     matrix, position = parse_matrix(f)
 simulator = AntSimulator(matrix, position, 1)
@@ -143,19 +132,5 @@ EV_PARAMS = {
     'cost_func': santafe_cost_function,
     'target_fitness': -89
 }
-        
-
-# example usage
-
-from pycgp.individual_builder import IndividualBuilder
-
-ib = IndividualBuilder(PARAMS)
-
-# individual = ib.build()
-
-# machine = individual.execute([X])[0][0]
-
-#machine()
-
 
 
