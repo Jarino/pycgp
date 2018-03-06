@@ -11,25 +11,35 @@ def to_graph(individual, output_path='individual'):
         graph.node(str(input_node))
 
     # add function nodes
+    for index, fnode in enumerate(individual.function_nodes):
+        if fnode.active:
+            color='black'
+        else:
+            color='gray'
 
-    for index, _ in enumerate(individual.function_nodes):
-        graph.node('f{}'.format(index))
+        graph.node('f{}'.format(index), color=color)
 
     # add output nodes
-
     for index, _ in enumerate(individual.output_genes):
         graph.node('o{}'.format(index))
 
     # add edges of function nodes
-
     for index, fnode in enumerate(individual.function_nodes):
-       for parent_id in fnode.inputs:
+        if fnode.active:
+            color = 'black'
+        else:
+            color = 'gray'
+
+        for order, parent_id in enumerate(fnode.inputs):
             parent = individual.nodes[parent_id]
+            if order >= individual.params.arities[fnode.function_index]:
+                color = 'gray'
+
             if type(parent) is InputNode:
-                graph.edge(str(parent), 'f{}'.format(index))
+                graph.edge(str(parent), 'f{}'.format(index), color=color)
 
             if type(parent) is FunctionNode:
-                graph.edge('f{}'.format(parent_id - len(individual.input_nodes)), 'f{0}'.format(index))
+                graph.edge('f{}'.format(parent_id - len(individual.input_nodes)), 'f{0}'.format(index), color=color)
 
     # add edges of output nodes
 
