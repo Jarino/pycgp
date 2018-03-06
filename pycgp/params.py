@@ -1,5 +1,5 @@
 """
-This module contains some simple default parameters to 
+This module contains some simple default parameters
 """
 
 FUNSET = {}
@@ -12,9 +12,8 @@ def protected_div(x, y):
     return x / y
 
 
-def fsum(x, y):
-    return x + y
-
+def fsum(arg1, arg2):
+    return arg1 + arg2
 
 def fdiv(x, y):
     return x - y
@@ -29,10 +28,21 @@ FUNSET[1] = fdiv
 FUNSET[2] = fmul
 FUNSET[3] = protected_div
 
-DEFAULT_PARAMS = {
-    'n_inputs': 3,
-    'n_outputs': 2,
-    'n_cols': 2,
-    'n_rows': 1,
-    'funset': FUNSET
-}
+
+class Params():
+    """docstring for Params"""
+
+    def __init__(self,
+                 n_inputs,
+                 n_outputs,
+                 n_columns=50,
+                 n_rows=1,
+                 funset=FUNSET,
+                 arity=2):
+
+        self.n_inputs = n_inputs
+        self.n_outputs = n_outputs
+        self.n_columns = n_columns
+        self.n_rows = n_rows
+        self.funset = funset
+        self.arity = arity

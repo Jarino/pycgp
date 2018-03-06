@@ -4,7 +4,7 @@ import pytest
 
 from pycgp.individual import Individual
 from pycgp.gems import JewelleryBox, GemSingleGene, MatchPMStrategy
-
+from pycgp import Params
 
 funset = {}
 
@@ -23,7 +23,7 @@ funset[2] = fsub
 
 bounds = [2, 2, 2, 2, 3, 3, 2, 4, 4, 2, 5, 5, 6]
 
-params = {'arity': 2, 'n_inputs': 3, 'n_outputs': 1, 'funset': funset}
+params = Params(3, 1, funset=funset)
 
 @pytest.fixture
 def individual():

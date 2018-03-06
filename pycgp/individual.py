@@ -17,7 +17,7 @@ class Individual():
         self.bounds = bounds
 
         self.nodes = map_to_phenotype(
-            genes, self.params['n_inputs'], self.params['arity'], self.params['n_outputs'])
+            genes, self.params.n_inputs, self.params.arity, self.params.n_outputs)
 
         self.fitness = None
         self.active_genes_vector = None
@@ -29,26 +29,26 @@ class Individual():
 
     @property
     def input_nodes(self):
-        return self.nodes[0:self.params['n_inputs']]
+        return self.nodes[0:self.params.n_inputs]
 
     @property
     def function_nodes(self):
-        n_inodes = self.params['n_inputs']
+        n_inodes = self.params.n_inputs
         n_fnodes = (len(self.genes) -
-                    self.params['n_outputs']) // (self.params['arity'] + 1)
+                    self.params.n_outputs) // (self.params.arity + 1)
         return self.nodes[n_inodes:n_inodes + n_fnodes]
 
     @property
     def output_nodes(self):
-        n_inodes = self.params['n_inputs']
+        n_inodes = self.params.n_inputs
         n_fnodes = (len(self.genes) -
-                    self.params['n_outputs']) // (self.params['arity'] + 1)
+                    self.params.n_outputs) // (self.params.arity + 1)
         return self.nodes[n_inodes + n_fnodes:]
 
     @property
     def output_genes(self):
         """ Return the list containing output genes as list of integers """
-        return self.genes[-self.params['n_outputs']:]
+        return self.genes[-self.params.n_outputs:]
 
     @property
     def active_genes(self):
@@ -58,14 +58,14 @@ class Individual():
             return self.active_genes_vector
 
         agenes = []
-        chunk_size = self.params['arity'] + 1
+        chunk_size = self.params.arity + 1
         for fnode in self.function_nodes:
             if fnode.active:
                 agenes = agenes + [1] * chunk_size
             else:
                 agenes = agenes + [0] * chunk_size
 
-        agenes = agenes + [1] * self.params['n_outputs']
+        agenes = agenes + [1] * self.params.n_outputs
         self.active_genes_vector = agenes
         return agenes
 
@@ -80,7 +80,7 @@ class Individual():
 
         for node in self.function_nodes:
             if node.active:
-                node.compute(self.nodes, self.params['funset'])
+                node.compute(self.nodes, self.params.funset)
 
         return [self.nodes[i].value for i in self.output_genes]
 
@@ -99,7 +99,7 @@ class Individual():
         active node or not """
         nodes = self.function_nodes + self.output_nodes
 
-        node_index = gene_index // (self.params['arity'] + 1)
+        node_index = gene_index // (self.params.arity + 1)
 
         if isinstance(nodes[node_index], OutputNode):
             return True
@@ -115,7 +115,7 @@ class Individual():
                 stack.append(str(node))
 
             if isinstance(node, FunctionNode):
-                fun = self.params['funset'][node.function_index]
+                fun = self.params.funset[node.function_index]
                 arity = len(signature(fun).parameters)
                 operands = reversed([stack.pop() for _ in range(0, arity)])
                 fname = fun.__name__

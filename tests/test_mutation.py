@@ -5,6 +5,7 @@ from pycgp.mutation import point_mutation
 from pycgp.mutation import single_mutation
 from pycgp.mutation import active_mutation
 from pycgp.mutation import probabilistic_mutation
+from pycgp import Params
 
 def test_point_mutation(monkeypatch):
     """ Test for simple point mutation """
@@ -23,11 +24,7 @@ def test_point_mutation(monkeypatch):
     genes = [2, 0, 1, 2, 1, 1, 2, 2, 2, 3]
     bounds = [2, 1, 1, 2, 2, 2, 2, 3, 3, 4]
 
-    individual = Individual(genes, bounds, {
-        'n_inputs': 2,
-        'n_outputs': 1,
-        'arity': 2,
-        'funset': {}})
+    individual = Individual(genes, bounds, Params(2, 1))
 
     mutated_individual, _ = point_mutation(individual)
 
