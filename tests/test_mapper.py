@@ -4,7 +4,6 @@ Test suite for mapper module
 
 from pycgp.mapper import map_to_phenotype
 from pycgp.node import FunctionNode,OutputNode,InputNode
-import pdb
 
 def test_map_to_phenotype(individual):
     """ Test, whether mapping of genes to nodes works """

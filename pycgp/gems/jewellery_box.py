@@ -2,7 +2,6 @@ from pycgp.gems import MatchStrategy
 from pycgp.individual import Individual
 from pycgp.gems import Gem
 from pycgp.counter import Counter
-import pdb
 
 class JewelleryBox():
     """ Container for existing gems """

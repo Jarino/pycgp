@@ -2,7 +2,8 @@
 
 from pycgp.gems import GemSingleGene, JewelleryBox
 from pycgp.individual import Individual
-import pdb
+
+
 def test_match(jewellerybox: JewelleryBox, individual: Individual):
     """ Should return matching gem """
 
