@@ -25,19 +25,11 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     - mutation_probability: float (0,1), probability of mutating a single gene, used only with probablisitic mutation
     """
     builder = IndividualBuilder(cgp_params)
-    mutation = ev_params.get('mutation', point_mutation)
-    selection = ev_params.get('selection', truncation_selection)
-    pop_size = ev_params.get('pop', 5)
-    apply_gem = ev_params.get('gems', 0)
-    cost_func = ev_params['cost_func']
-    gem_type = ev_params.get('gem_type', GemSingleGene)
-    match_strategy = ev_params.get('match_strategy', MatchPMStrategy)
-    mutation_probability = ev_params.get('mutation_probability', 0.25)
-    expire_gems = ev_params.get('expire_gems', 0)
+    apply_gem = ev_params.gems_box_size
+    target_fitness_is_set = ev_params.target_fitness is not None
 
 
-
-    population = [builder.build() for _ in range(0, pop_size)]
+    population = [builder.build() for _ in range(0, ev_params.population_size)]
     evaluations_counter = 0
     Counter.get().dict['g_better'] = 0
     Counter.get().dict['g_worse'] = 0
@@ -47,17 +39,17 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     Counter.get().dict['remove_gem'] = 0
     Counter.get().dict['best_individual'] = []
 
-    j_box = JewelleryBox(match_strategy(), max_size=apply_gem)
+    j_box = JewelleryBox(ev_params.gem_match_strategy(), max_size=apply_gem)
 
     for individual in population:
         output = individual.execute(X)
-        individual.fitness = ev_params['cost_func'](y, output)
+        individual.fitness = ev_params.cost_function(y, output)
         evaluations_counter += 1
    
     Counter.get().dict['gens'] = 0
     Counter.get().dict['g_same_as_parent'] = 0
     gens = 0
-    while evaluations_counter < ev_params.get('max_evaluations', 5000):
+    while evaluations_counter < ev_params.max_evaluations:
         gens += 1
         # store mean of population and best
         Counter.get().dict['mean'].append(statistics.mean(
@@ -68,16 +60,16 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         ).fitness)
 
 
-        parent = selection(population, 1)[0]
+        parent = ev_params.selection(population, 1)[0]
         Counter.get().dict['best_individual'].append(parent)
 
-        if parent.fitness <= ev_params['target_fitness']:
+        if target_fitness_is_set and (parent.fitness <= ev_params.target_fitness):
             break
         
         population = []
         m_indices = []
-        for _ in range(0, pop_size - 1):
-            individual, mutated_index = mutation(parent, mutation_probability)
+        for _ in range(0, ev_params.population_size - 1):
+            individual, mutated_index = ev_params.mutation(parent, ev_params.mutation_probability)
             population.append(individual)
             m_indices.append(mutated_index)
 
@@ -85,11 +77,9 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                 individual.fitness = parent.fitness
             else:
                 output = individual.execute(X)
-                individual.fitness = cost_func(y, output)
+                individual.fitness = ev_params.cost_function(y, output)
                 evaluations_counter += 1
-        
-        
-
+       
         if not apply_gem:
             # skip this whole gem-jewellery mumbo-jumbo
             population = population + [parent]
@@ -98,7 +88,9 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         for index, (individual, m_index) in enumerate(zip(population, m_indices)):
             if individual.fitness < parent.fitness:
                 Counter.get().dict['g_better_fitness'].append(individual.fitness - parent.fitness)
-                j_box.add(gem_type(individual, parent, m_index))
+                j_box.add(
+                    ev_params.gem_match_strategy.associated_gem_type(
+                        individual, parent, m_index))
             else:
                 # apply gem
                 matching_gem = j_box.match(individual)
@@ -109,10 +101,10 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         Counter.get().dict['g_same_as_parent'] += 1
                     else:
                         # if gem exceeds 30 uses, remove
-                        if expire_gems and matching_gem.n_uses >= expire_gems:
+                        if ev_params.gem_expire and matching_gem.n_uses >= ev_params.gem_expire:
                             j_box.remove(matching_gem)
 
-                        new_individual.fitness = cost_func(y, new_individual.execute(X))
+                        new_individual.fitness = ev_params.cost_function(y, new_individual.execute(X))
                         evaluations_counter += 1 
                         
                         if new_individual.fitness < individual.fitness:

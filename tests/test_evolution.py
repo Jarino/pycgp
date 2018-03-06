@@ -1,5 +1,7 @@
 """ Integration test for the whole evolution process """
 
+from pycgp import EvParams
+
 def test_evolution():
     """ Should pass without error """
 
@@ -15,12 +17,7 @@ def test_evolution():
     X = [[1], [2], [3], [4]]
     y = [[1], [2], [3], [4]]
 
-    ev_params = {
-            'cost_func': mean_squared_error,
-            'target_fitness': 0,
-            'gems': True,
-            'j_box_size': 50
-    }
+    ev_params = EvParams(mean_squared_error, gems_box_size=5)
 
     DEFAULT_PARAMS['n_rows'] = 1
     DEFAULT_PARAMS['n_cols'] = 5
