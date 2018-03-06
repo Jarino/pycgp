@@ -55,7 +55,7 @@ def test_single_mutation(individual, monkeypatch):
 
     mutated, _ = single_mutation(individual)
 
-    assert mutated.genes == [1, 1, 0, 0, 1, 1, 0, 4, 2, 2, 1, 3, 6]
+    assert mutated.genes == [1, 1, 0, 0, 1, 1, 0, 4, 2, 2, 3, 1, 6]
 
 
 def test_active_mutation(individual, monkeypatch):
@@ -75,7 +75,7 @@ def test_active_mutation(individual, monkeypatch):
 
     mutated, _ = active_mutation(individual)
 
-    assert mutated.genes == [1, 1, 0, 1, 1, 1, 0, 4, 2, 2, 1, 3, 6]
+    assert mutated.genes == [1, 1, 0, 1, 1, 1, 0, 4, 2, 2, 3, 1, 6]
 
 
 def test_probabilistic_mutation(individual, monkeypatch):
@@ -101,5 +101,5 @@ def test_probabilistic_mutation(individual, monkeypatch):
 
     mutated, changed_indices = probabilistic_mutation(individual, rate)
 
-    assert mutated.genes != [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 1, 3, 6]
+    assert mutated.genes != [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 3, 1, 6]
     assert changed_indices == [0, 1, 6, 7] 

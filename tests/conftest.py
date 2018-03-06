@@ -28,7 +28,7 @@ params = Params(3, 1, funset=funset)
 
 @pytest.fixture
 def individual():
-    genes = [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 1, 3, 6]
+    genes = [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 3, 1, 6]
     #active [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
 
     return Individual(genes, bounds, params)

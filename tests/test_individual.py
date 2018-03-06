@@ -26,7 +26,7 @@ class TestIndividual(object):
 
         output = individual.execute(input_data)
 
-        assert output[0] == 8 
+        assert output[0] == 100 
 
 
 
@@ -38,13 +38,13 @@ class TestIndividual(object):
 
         output = individual.execute(input_data)
 
-        assert output == [[8], [4]]
+        assert output == [[100], [64]]
 
         np_input_data = np.array(input_data)
 
         output = individual.execute(np_input_data)
 
-        assert output == [[8], [4]]
+        assert output == [[100], [64]]
 
     def test_marking_active(self, individual):
         """ Test whether individual correctly marks its nodes as (in)active """

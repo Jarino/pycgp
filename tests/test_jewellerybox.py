@@ -9,7 +9,7 @@ def test_match(jewellerybox: JewelleryBox, individual: Individual):
 
     matching_gem = jewellerybox.match(individual)
 
-    assert hash(matching_gem) == 1015
+    assert hash(matching_gem) == 413 
 
 
 def test_add_to_full(individual: Individual, jewellerybox: JewelleryBox):

@@ -18,7 +18,15 @@ def iterate_active_nodes(individual):
 
         yield current_node
 
-        for input_id in current_node.inputs:
+        n_inputs = 1
+
+        # hackish way to check, whether it is a function node
+        if 'function_index' in current_node.__dict__:
+            # it is function node
+            n_inputs = individual.params.arities[current_node.function_index]
+
+
+        for input_id in current_node.inputs[:n_inputs]:
             stack.append(individual.nodes[input_id])
 
 
