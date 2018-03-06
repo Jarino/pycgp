@@ -30,9 +30,10 @@ class FunctionNode(Node):
         self.genes = genes
         super().__init__(index)
 
-    def compute(self, other_nodes, funset):
-        fun = funset[self.function_index]
-        self.value = fun(*[other_nodes[x].value for x in self.inputs])
+    def compute(self, other_nodes, params):
+        fun = params.funset[self.function_index]
+        arity = params.arities[self.function_index]
+        self.value = fun(*[other_nodes[x].value for x in self.inputs[:arity]])
 
     def update(self, genes):
         self.active = False

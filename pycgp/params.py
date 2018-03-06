@@ -2,6 +2,8 @@
 This module contains some simple default parameters
 """
 
+from inspect import signature
+
 FUNSET = {}
 
 
@@ -46,3 +48,4 @@ class Params():
         self.n_rows = n_rows
         self.funset = funset
         self.arity = arity
+        self.arities = [len(signature(f).parameters) for f in funset.values()]

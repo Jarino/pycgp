@@ -1,5 +1,7 @@
 """ Test suite for CGP individual """
 
+from copy import deepcopy
+
 import numpy as np
 
 from pycgp.individual import Individual
@@ -24,7 +26,10 @@ class TestIndividual(object):
 
         output = individual.execute(input_data)
 
-        assert output[0] == -92
+        assert output[0] == 8 
+
+
+
 
     def test_evaluation_of_multiple_instances(self, individual):
         """ Test the evaluation of multidim input data """
@@ -33,13 +38,13 @@ class TestIndividual(object):
 
         output = individual.execute(input_data)
 
-        assert output == [[-92], [-60]]
+        assert output == [[8], [4]]
 
         np_input_data = np.array(input_data)
 
         output = individual.execute(np_input_data)
 
-        assert output == [[-92], [-60]]
+        assert output == [[8], [4]]
 
     def test_marking_active(self, individual):
         """ Test whether individual correctly marks its nodes as (in)active """
@@ -59,7 +64,7 @@ class TestIndividual(object):
     def test_print(self, individual):
         """ test printing the individual """
 
-        assert str(individual) == 'fsub(x1,fmul(x0,x0))'
+        assert str(individual) == 'fsin(fmul(x0,x0))'
 
     def test_equality(self, individual):
         """ Test the equality of two individuals """

@@ -14,12 +14,13 @@ def fsum(x, y):
 def fmul(x, y):
     return x * y
 
-def fsub(x, y):
-    return x - y
+def fsin(x):
+    return x
+
 
 funset[0] = fsum
 funset[1] = fmul
-funset[2] = fsub
+funset[2] = fsin
 
 bounds = [2, 2, 2, 2, 3, 3, 2, 4, 4, 2, 5, 5, 6]
 

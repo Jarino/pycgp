@@ -80,7 +80,7 @@ class Individual():
 
         for node in self.function_nodes:
             if node.active:
-                node.compute(self.nodes, self.params.funset)
+                node.compute(self.nodes, self.params)
 
         return [self.nodes[i].value for i in self.output_genes]
 

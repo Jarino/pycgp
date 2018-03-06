@@ -1,5 +1,6 @@
 from pycgp.node import FunctionNode
 
+
 class NodeMock:
     def __init__(self, value):
         self.value = value
@@ -11,6 +12,16 @@ def test_function_node_compute():
     funset_mock = {}
     funset_mock[2] = lambda x, y: x + y
 
-    funnode.compute(nodes, funset_mock)
+    arities = [0]*3
+    arities[2] = 2
+
+    class ParamsMock():
+        def __init__(self, funset, arities):
+            self.funset = funset
+            self.arities = arities
+            
+
+
+    funnode.compute(nodes, ParamsMock(funset_mock, arities))
 
     assert funnode.value == 12
