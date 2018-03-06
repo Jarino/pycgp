@@ -66,6 +66,12 @@ class TestIndividual(object):
 
         assert str(individual) == 'fsin(fmul(x0,x0))'
 
+    def test_print_of_multiple_outputs(self, mo_individual):
+        """ test printing the individual with multiple outputs """
+        
+        assert str(mo_individual) == 'fsin(fmul(x0,x0))|fmul(x0,x0)' 
+
+
     def test_equality(self, individual):
         """ Test the equality of two individuals """
         # create a new, same individual

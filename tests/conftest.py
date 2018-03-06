@@ -55,3 +55,11 @@ def jewellerybox():
     return box
     
 
+@pytest.fixture
+def mo_individual():
+    """as multi-output individual"""
+    mo_bounds = bounds[:]
+    mo_bounds.append(6)
+    mo_genes = [1, 0, 0, 1, 1, 1, 0, 4, 2, 2, 3, 1, 6, 3]
+
+    return Individual(mo_genes, mo_bounds, Params(3, 2, funset=funset))

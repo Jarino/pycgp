@@ -109,7 +109,12 @@ class Individual():
     def __str__(self):
         """ Print the resulting function """
         stack = []
+        result = []
+
         for node in reversed(list(iterate_active_nodes(self))):
+            if isinstance(node, OutputNode):
+                result.append(stack.pop())
+                continue
 
             if isinstance(node, InputNode):
                 stack.append(str(node))
@@ -121,7 +126,7 @@ class Individual():
                 fname = fun.__name__
                 stack.append('{}({})'.format(fname, ','.join(operands)))
 
-        return stack.pop()
+        return '|'.join(result)
 
     def __eq__(self, other):
         """
