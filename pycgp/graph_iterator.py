@@ -10,15 +10,15 @@ def iterate_active_nodes(individual):
     """
     stack = []
 
-    for onode in individual.output_nodes:
-        stack.append(onode)
+    for onode_index in range(0, len(individual.output_nodes)):
+        stack.append(individual.output_nodes[onode_index])
 
     while len(stack) > 0:
         current_node = stack.pop()
 
         yield current_node
 
-        n_inputs = 1
+        n_inputs = len(current_node.inputs)
 
         # hackish way to check, whether it is a function node
         if 'function_index' in current_node.__dict__:
@@ -26,8 +26,10 @@ def iterate_active_nodes(individual):
             n_inputs = individual.params.arities[current_node.function_index]
 
 
-        for input_id in current_node.inputs[:n_inputs]:
-            stack.append(individual.nodes[input_id])
+        for index in range(0, n_inputs):
+            stack.append(individual.nodes[current_node.inputs[index]])
+        #for input_id in current_node.inputs:
+        #    stack.append(individual.nodes[input_id])
 
 
 

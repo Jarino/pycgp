@@ -25,15 +25,15 @@ def pdiv(x, y):
 def sub(x, y):
     return x - y
 
-def plog(x, _):
+def plog(x):
     if x <= 0:
         return x
     return olog(x)
 
-def sin(x, _):
+def sin(x):
     return osin(x)
 
-def cos(x, _):
+def cos(x):
     return ocos(x)
 
 FUNSET = {}
