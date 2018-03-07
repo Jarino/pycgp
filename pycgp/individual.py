@@ -1,6 +1,7 @@
 """ Individual """
 from copy import deepcopy
 from inspect import signature
+from itertools import compress
 
 import numpy as np
 
@@ -8,7 +9,9 @@ from pycgp.graph_iterator import iterate_active_nodes
 from pycgp.mapper import map_to_phenotype
 from pycgp.node import FunctionNode, InputNode, OutputNode
 from pycgp.utils import split_to_chunks
+from pycgp.counter import Counter
 
+import pdb
 
 class Individual():
     def __init__(self, genes, bounds, params):
@@ -133,7 +136,8 @@ class Individual():
         Check whether two individuals are the same according to their
         phenotypes (genes of active nodes)
         """
-        active_genes = [x * y for x, y in zip(self.active_genes, self.genes)]
-        other_active_genes = [x * y for x,
-                              y in zip(other.active_genes, other.genes)]
-        return active_genes == other_active_genes
+        
+        active_genes = list(compress(self.genes, self.active_genes))
+        other_a_genes= list(compress(other.genes, other.active_genes))
+
+        return active_genes == other_a_genes

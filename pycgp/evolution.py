@@ -38,6 +38,8 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     Counter.get().dict['g_better_fitness'] = []
     Counter.get().dict['remove_gem'] = 0
     Counter.get().dict['best_individual'] = []
+    Counter.get().dict['not_equal_a'] = 0
+    Counter.get().dict['not_equal_o'] = 0
 
     j_box = JewelleryBox(ev_params.gem_match_strategy(), max_size=apply_gem)
 
