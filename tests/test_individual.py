@@ -5,7 +5,8 @@ from copy import deepcopy
 import numpy as np
 
 from pycgp.individual import Individual
-
+from pycgp import Params
+from pycgp.individual_builder import IndividualBuilder
 
 class TestIndividual(object):
 
@@ -96,3 +97,12 @@ class TestIndividual(object):
         assert not (individual == mod_act_ind)
         assert individual != mod_act_ind
         assert individual == mod_inact_ind
+
+    def test_number_of_output_nodes(self):
+        """Test whether the number of output nodes is correct"""
+        ib4outputs = IndividualBuilder(Params(n_inputs=4, n_outputs=4))
+
+        individual = ib4outputs.build()
+
+        assert len(individual.output_nodes) == 4
+
