@@ -1,20 +1,32 @@
 # PyCGP, Cartesian Genetic Programming in Python
 
-Still in early phase of development.
+## Installation
 
-## Local installation
+Using [pipenv](https://pipenv.readthedocs.io/en/latest/) for virtual environment.
+
+Clone the repository :
 ```
+git clone https://github.com/Jarino/pycgp.git
+cd pycgp
+```
+
+### Install in virtual environment
+
+```
+pipenv install
+pipenv shell
+make test
 make develop
 ```
-This will install the package, so it can be used system-wide.
 
-## Tests
+### Install system wide
 ```
+pipenv install --system
 make test
+make develop
 ```
+
 
 ## Usage
 
-TODO
-
-For now, see [example notebooks](https://github.com/Jarino/pycgp-notebooks).
+For now, see [example notebooks](https://github.com/Jarino/bd-seminar-gp).
