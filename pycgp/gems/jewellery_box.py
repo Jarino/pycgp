@@ -37,7 +37,6 @@ class JewelleryBox():
 
     def remove(self, gem: Gem):
         # get index of matching gem
-        Counter.get().dict['remove_gem'] += 1
         del self.gems[gem]
 
 
