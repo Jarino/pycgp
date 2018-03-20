@@ -1,12 +1,20 @@
 """ Module containing classes for Gems extension """
 
+
+from functools import reduce
+from operator import mul
+from abc import ABC, abstractmethod
+
 from pycgp.individual import Individual
 from pycgp.counter import Counter
 
-
-from abc import ABC, abstractmethod
+import ipdb
 
 class Gem(ABC):
+
+    def __init__(self):
+        self.match_checks = 0
+        self.match_count = 0
 
     def __hash__(self):
         n = 0
@@ -45,7 +53,13 @@ class GemMultipleGenes(Gem):
         self.digits = [*m_indices, *self.originals]
         self.value = parent.fitness - child.fitness
         self.n_uses = 0
-    
+        self.match_checks = 0
+        self.match_count = 0
+        self.gene_possible_values= reduce(
+            mul, [child.bounds[m] + 1 for m in m_indices], 1)
+
+        all_posibilities = reduce(mul, map(add_one, child.bounds), 1)
+        self.match_probability = 1/all_posibilities 
 
     def apply(self, individual: Individual) -> Individual:
         self.n_uses += 1
@@ -55,6 +69,8 @@ class GemMultipleGenes(Gem):
         return Individual(genes, individual.bounds, individual.params)
         
 
+def add_one(number):
+    return number + 1
 
 class GemSingleGene(Gem):
     """ Class representing one gem.
@@ -71,8 +87,12 @@ class GemSingleGene(Gem):
         self.digits = [m_index, self.original, self.mutated]
         self.value = parent.fitness - child.fitness
         self.n_uses = 0
+        self.match_checks = 0
+        self.match_count = 0
+        self.gene_possible_values = child.bounds[m_index] + 1
 
-
+        all_posibilities = reduce(mul, map(add_one, child.bounds), 1)
+        self.match_probability = 1/all_posibilities
 
     def apply(self, individual: Individual) -> Individual:
         if individual.active_genes[self.index] == 0:

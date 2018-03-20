@@ -1,5 +1,7 @@
 """ Integration test for the whole evolution process """
 
+import pytest
+
 from pycgp import EvParams, Params
 from pycgp.evolution import evolution
 from pycgp.mutation import single_mutation
@@ -8,6 +10,7 @@ from pycgp.counter import Counter
 
 from sklearn.metrics import mean_squared_error
 
+@pytest.mark.skip(reason='takes too long')
 def test_evolution():
     """ Should pass without error """
 

@@ -2,7 +2,7 @@
 
 from pycgp.gems import GemSingleGene
 from pycgp.individual import Individual
-
+from pycgp import Params
 
 
 def test_hash(individual):
@@ -29,3 +29,18 @@ def test_hash(individual):
     assert hash(g) == hash(g)
 
 
+def test_probability_calculation():
+    params = Params(0, 0)
+
+    child = Individual([2,2,2,1], [2,2,2,3], params)
+    child.fitness = 10
+    parent = Individual([2,1,2,1], [2,2,2,3], params)
+    parent.fitness = 100
+
+    gem = GemSingleGene(child, parent, 1)
+
+    assert gem.match_probability == 1/3
+
+    gem = GemSingleGene(child, parent, 3)
+
+    assert gem.match_probability == 1/4
