@@ -39,19 +39,20 @@ def run_experiment(params, ev_params, x, y):
     mean_fitness = []
     std_fitness = []
     test_error = []
-    for i in range(0, 1):
+    for i in range(0, 20):
         print(i, end=', ')
 
         result = evolution(params, ev_params, X_train, y_train)
 
         stats = result['stats']
-        best_fitness.append([x.fitness for x in stats['best_of_generation']])
+        current_run_best_fitness = [x.fitness for x in stats['best_of_generation']]
+        best_fitness.append(current_run_best_fitness)
         mean_fitness.append(stats['mean_of_generation'])
         std_fitness.append(stats['std_of_generation'])
         n_better.append(stats['gem_better_after'])
         n_worse.append(stats['gem_worse_after'])
 
-        index_of_best = np.argmin(best_fitness)
+        index_of_best = np.argmin(current_run_best_fitness)
         test_error.append(ev_params.cost_function(y_test,
             stats['best_of_generation'][index_of_best].execute(X_test)))
 
@@ -151,5 +152,6 @@ for mutation, strategy in mutations:
             fitness_data.to_csv(filename)
 
             # gstat.to_csv(f'gstats-{filename}')
+            data.to_csv(f'{output_folder}result-{experiment_count}.csv', sep=',')
 
 data.to_csv(f'{output_folder}result.csv', sep=',')
