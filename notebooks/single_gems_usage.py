@@ -5,7 +5,9 @@ from pycgp.counter import Counter
 import pandas as pd
 
 params = Params(1, 1, funset=PARAMS['funset'])
-ev_params = EvParams(EV_PARAMS['cost_func'], gems_box_size=10, population_size=10)
+ev_params_point = EvParams(EV_PARAMS['cost_func'], gems_box_size=10, population_size=5)
+ev_params_single = EvParams(EV_PARAMS['cost_func'], gems_box_size=10, population_size=5)
+
 
 def get_data(gems):
     data = pd.DataFrame([(
@@ -22,7 +24,8 @@ def get_data(gems):
 
 __all__ = [
     'params',
-    'ev_params',
+    'ev_params_point',
+    'ev_params_single',
     'get_data',
     'evolution',
     'X',

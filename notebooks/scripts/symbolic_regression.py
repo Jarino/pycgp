@@ -4,7 +4,6 @@ from pycgp.evolution import evolution
 from pycgp.counter import Counter
 import random
 import numpy as np
-import pandas as pd
 from time import time
 import pandas as pd
 import sys
@@ -100,11 +99,11 @@ from pycgp import point_mutation, probabilistic_mutation, single_mutation
 mutations = [
         (single_mutation, MatchSMStrategy),
         (point_mutation, MatchPMStrategy),
-        (probabilistic_mutation, MatchSMStrategy)]
-
-for mutation, strategy in [
+        (probabilistic_mutation, MatchSMStrategy),
         (single_mutation, MatchByActiveStrategy),
-        (probabilistic_mutation, MatchByActiveStrategy)]:
+        (probabilistic_mutation, MatchByActiveStrategy)]
+
+for mutation, strategy in mutations:
     for gems in [0, 5, 10]:
         ev_params = EvParams(
             EV_PARAMS['cost_func'],
