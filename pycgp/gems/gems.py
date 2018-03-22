@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from pycgp.individual import Individual
 from pycgp.counter import Counter
 
-import ipdb
 
 class Gem(ABC):
 

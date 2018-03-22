@@ -3,7 +3,7 @@ from copy import deepcopy
 from inspect import signature
 from itertools import compress
 
-import numpy as np
+#import numpy as np
 
 from pycgp.graph_iterator import iterate_active_nodes
 from pycgp.mapper import map_to_phenotype
@@ -92,7 +92,7 @@ class Individual():
 
     def execute(self, data):
         """ Execute the individual with given data """
-        if np.isscalar(data[0]):
+        if not isinstance(data[0], list):#np.isscalar(data[0]):
             return self.__execute_single(data)
         else:
             return self.__execute_many(data)
