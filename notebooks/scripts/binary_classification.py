@@ -1,939 +1,157 @@
-from pycgp.benchmarks.classification import X_train, y_train, X_test, y_test, PARAMS, EV_PARAMS
+from pycgp.benchmarks.classification import PARAMS, EV_PARAMS, X_train, X_test, y_train, y_test
+from pycgp import Params, EvParams
 from pycgp.evolution import evolution
 from pycgp.counter import Counter
 import random
 import numpy as np
+import pandas as pd
 from time import time
 import pandas as pd
-
+import sys
+from functools import reduce
+from operator import add
 experiment_count = 0
-X = None
-y = None
-def run_experiment(PARAMS,EV_PARAMS, dum1, dum2):
+
+def get_data(gems):
+    return [(
+        x.n_uses, 
+        x.match_checks, 
+        x.match_count, 
+        x.gene_possible_values,
+        x.match_probability
+        ) for x in gems]    
+    
+    columns = ['n_uses', 'match_checks', 'match_count', 'gene_possible_values', 'match_probability']
+    data.columns = columns
+    data['empiric'] = data.iloc[:,2]/data.iloc[:,1]
+    return data
+
+def run_experiment(params, ev_params, x, y):
     global experiment_count
     experiment_count += 1
+
     print('Experiment #{}'.format(experiment_count))
     start = time()
-    
     n_better = []
     n_worse = []
     n_same = []
-    
-    train_stat = []
-    test_stat = []
-    for i in range(0, 5):
+    best_fitness = []
+    mean_fitness = []
+    std_fitness = []
+    test_error = []
+    for i in range(0, 20):
         print(i, end=', ')
-        result = evolution(PARAMS, EV_PARAMS, X_train, y_train)
-        
-        train_stat.append([x.fitness for x in result['final']])
-        test_stat.append([EV_PARAMS['cost_func'](y_test, x.execute(X_test)) for x in result['final']   ])
-        n_better.append(Counter.get().dict['g_better'])
-        n_worse.append(Counter.get().dict['g_worse'])
-        n_same.append(Counter.get().dict['g_same_as_parent'])
-    
-    
-    train_results = [
-        np.min(train_stat), # best fitness
-        np.mean(train_stat), # mean of fitnesses of all last generations
-        np.std(train_stat), # std of fitnesses of all last generations
-        np.mean(np.min(train_stat, axis=1)), # mean of best individuals from run
-        np.std(np.min(train_stat, axis=1)), # std of best individuals from run
-        np.sum(n_better), np.mean(n_better),
-        np.sum(n_worse), np.mean(n_worse),
-        np.sum(n_same), np.mean(n_same)
+
+        result = evolution(params, ev_params, X_train, y_train)
+
+        stats = result['stats']
+        current_run_best_fitness = [x.fitness for x in stats['best_of_generation']]
+        best_fitness.append(current_run_best_fitness)
+        mean_fitness.append(stats['mean_of_generation'])
+        std_fitness.append(stats['std_of_generation'])
+        n_better.append(stats['gem_better_after'])
+        n_worse.append(stats['gem_worse_after'])
+
+        index_of_best = np.argmin(current_run_best_fitness)
+        test_error.append(ev_params.cost_function(y_test,
+            stats['best_of_generation'][index_of_best].execute(X_test)))
+
+    # make the best_fitness and mean_fitness lists the lists with same length
+    for measurement in [best_fitness, mean_fitness]:
+        longest = max([len(x) for x in measurement]) # since we know its only 2D its faster than np.max
+        for l in measurement:
+            extension = [l[-1]] * (longest - len(l))
+            l.extend(extension)
+
+    iob = np.unravel_index(np.argmin(best_fitness), np.array(best_fitness).shape)    
+    results = [
+        np.min(best_fitness), # best fitness of all
+        mean_fitness[iob[0]][iob[1]], # best generation mean
+        std_fitness[iob[0]][iob[1]], # std generation mean
+        # TODO
+        # get best test error and mean and std of test error
+        np.min(test_error), # best test error
+        np.mean(test_error), # mean of test error
+        np.std(test_error), # std of test error
+        np.sum(n_better), # total number of better after gem
+        np.mean(n_better), # averge number of better after gem
+        np.sum(n_worse), # total number of worse after gem
+        np.mean(n_worse) # average number of worse after gem
     ]
-    
-    test_results = [
-        np.min(test_stat), # best fitness
-        np.mean(test_stat), # mean of fitnesses of all last generations
-        np.std(test_stat), # std of fitnesses of all last generations
-        np.mean(np.min(test_stat, axis=1)), # mean of best individuals from run
-        np.std(np.min(test_stat, axis=1)), # std of best individuals from run
-        np.sum(n_better), np.mean(n_better),
-        np.sum(n_worse), np.mean(n_worse),
-        np.sum(n_same), np.mean(n_same)
-    ]
-    print('Train: ', train_results)
-    print('Test: ', test_results)
     end = time()
     print('wall time {}'.format(end-start))
-    return train_results, test_results
-        
-        
 
-from pycgp.mutation import point_mutation
-train_measurements = {}
-test_measurements = {}
-EV_PARAMS['gems'] = 0
-EV_PARAMS['mutation'] = point_mutation
-EV_PARAMS['expire_gems'] = 0
-#
-# POINT MUTATION 
-# without gems
-# 
-random.seed(1)
-PARAMS['n_cols'] = 10
-key = '10,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 0
-#
-EV_PARAMS['gems'] = 5
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 30
-#
-EV_PARAMS['gems'] = 5
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-#
-# POINT MUTATION
-# with gems, 10, expire 30
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 0
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 10, expire 0
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_pm_train.csv')
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_pm_test.csv')
-
-#########################################################################
-#
-# Single mutation, match all
-#
-#########################################################################
-
-
-from pycgp.mutation import single_mutation
-from pycgp.gems import GemSM, MatchSMStrategy
-all_measurements = {}
-EV_PARAMS['gems'] = 0
-EV_PARAMS['gem_type'] = GemSM
-EV_PARAMS['match_strategy'] = MatchSMStrategy
-EV_PARAMS['mutation'] = single_mutation
-
-EV_PARAMS['expire_gems'] = 0
-
-#
-# SINGLE MUTATION 
-# without gems
-# 
-random.seed(1)
-PARAMS['n_cols'] = 10
-key = '10,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 0
-#
-EV_PARAMS['gems'] = 5
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 30
-#
-EV_PARAMS['gems'] = 5
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-#
-# POINT MUTATION
-# with gems, 10, expire 30
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 0
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 10, expire 0
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_sm_all_train.csv')
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_sm_all_test.csv')
-
-
-#########################################################################
-#
-# Single mutation, match active
-#
-#########################################################################
-
-
-from pycgp.mutation import single_mutation
-from pycgp.gems import MatchByActiveStrategy
-all_measurements = {}
-EV_PARAMS['gems'] = 0
-EV_PARAMS['gem_type'] = GemSM
-EV_PARAMS['match_strategy'] = MatchByActiveStrategy
-EV_PARAMS['mutation'] = single_mutation
-
-
-#
-# SINGLE MUTATION 
-# without gems
-# 
-random.seed(1)
-PARAMS['n_cols'] = 10
-key = '10,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 0
-#
-EV_PARAMS['gems'] = 5
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 30
-#
-EV_PARAMS['gems'] = 5
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-#
-# POINT MUTATION
-# with gems, 10, expire 30
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 0
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 10, expire 0
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_sm_active_train.csv')
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_sm_active_test.csv')
-
-
-
-#########################################################################
-#
-# Probabilistic mutation, match all
-#
-#########################################################################
-
-
-from pycgp.mutation import probabilistic_mutation
-all_measurements = {}
-EV_PARAMS['gems'] = 0
-EV_PARAMS['gem_type'] = GemSM
-EV_PARAMS['match_strategy'] = MatchSMStrategy
-EV_PARAMS['mutation'] = probabilistic_mutation
-
-
-#
-# without gems
-# 
-random.seed(1)
-PARAMS['n_cols'] = 10
-key = '10,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 0
-#
-EV_PARAMS['gems'] = 5
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 30
-#
-EV_PARAMS['gems'] = 5
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-#
-# POINT MUTATION
-# with gems, 10, expire 30
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 0
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 10, expire 0
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_probm_all_train.csv')
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_probm_all_test.csv')
-
-#########################################################################
-#
-# Probabilistic mutation, match active
-#
-#########################################################################
-
-
-from pycgp.mutation import probabilistic_mutation
-all_measurements = {}
-EV_PARAMS['gems'] = 0
-EV_PARAMS['gem_type'] = GemSM
-EV_PARAMS['match_strategy'] = MatchByActiveStrategy
-EV_PARAMS['mutation'] = probabilistic_mutation
-
-
-#
-# without gems
-# 
-random.seed(1)
-PARAMS['n_cols'] = 10
-key = '10,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,0,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,0,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 0
-#
-EV_PARAMS['gems'] = 5
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 5, expire 30
-#
-EV_PARAMS['gems'] = 5
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,5,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,5,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-
-#
-# POINT MUTATION
-# with gems, 10, expire 30
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 0
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,0'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,0'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-#
-# POINT MUTATION
-# with gems, 10, expire 0
-#
-EV_PARAMS['gems'] = 10
-EV_PARAMS['expire_gems'] = 30
-
-random.seed(1)
-PARAMS['n_cols'] = 10
-#all_measurements['10,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '10,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 50
-#all_measurements['50,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '50,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-random.seed(1)
-PARAMS['n_cols'] = 100
-#all_measurements['100,10,30'] = run_experiment(PARAMS, EV_PARAMS, X, y)
-key = '100,10,30'
-results = run_experiment(PARAMS, EV_PARAMS, X, y)
-train_measurements[key] = results[0]
-test_measurements[key] = results[1]
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_probm_actve_train.csv')
-
-df = pd.DataFrame.from_dict(train_measurements, orient='index')
-df.columns = ['best fitness', 'mean of last gen', 'std of last gen', 'mean of best individual', 'std of best indvidiual',
-             'g_better', 'g_better avg', 'g_worse', 'g_worse avg', 'g_same', 'g_same avg']
-df.to_csv('out/binclass_probm_active_test.csv')
+    # avg_gstat = reduce(add, gstat)/len(gstat) 
+    return results, np.mean(best_fitness, axis=0), np.mean(mean_fitness, axis=0) #, avg_gstat
+
+columns = [
+    'mutation',
+    'strategy',
+    'gems',
+    'n_cols',
+    'overall_best',
+    'overall_best_mean',
+    'overall_best_std',
+    'test_error_best',
+    'test_error_mean',
+    'test_error_std',
+    'better_gems_total',
+    'better_gems_mean',
+    'worse_gems_total',
+    'worse_gems_mean'
+]
+
+data = pd.DataFrame(columns=columns)
+
+output_folder = 'bin_class_out/'
+
+# params to change
+# mutation, gems, expire, cols,
+from pycgp.gems import MatchPMStrategy, MatchSMStrategy, MatchByActiveStrategy
+from pycgp import point_mutation, probabilistic_mutation, single_mutation
+
+mutations = [
+        (point_mutation, MatchPMStrategy),
+        (single_mutation, MatchSMStrategy),
+        (single_mutation, MatchByActiveStrategy),
+        (probabilistic_mutation, MatchSMStrategy),
+        (probabilistic_mutation, MatchByActiveStrategy)]
+
+for mutation, strategy in mutations:
+    for gems in [0, 5, 10]:
+        ev_params = EvParams(
+            EV_PARAMS['cost_func'],
+            target_fitness=-1,
+            gems_box_size=gems,
+            gem_match_strategy=strategy,
+            mutation=mutation,
+            fitness_of_invalid=0)
+        for n_cols in [100, 50, 10]:
+            params = Params(
+                n_columns=n_cols,
+                n_inputs=30, 
+                n_outputs=1,
+                funset=PARAMS['funset'])
+
+            row = [mutation.__name__, strategy.__name__, gems, n_cols]
+
+            random.seed(1)
+
+            filename = f'{output_folder}{mutation.__name__}-{strategy.__name__}-gems{gems}-n_cols{n_cols}.csv'
+            print(filename)
+            gem_data, best_fitness, mean_fitness = run_experiment(
+                params, ev_params, X_train, y_train)
+
+            row += gem_data
+
+            data.loc[experiment_count] = row
+
+            fitness_data = pd.DataFrame()
+            fitness_data['best_fitness'] = best_fitness
+            fitness_data['mean_fitness'] = mean_fitness
+            fitness_data.to_csv(filename)
+
+            # gstat.to_csv(f'gstats-{filename}')
+            data.to_csv(f'{output_folder}result-{experiment_count}.csv', sep=',')
+
+data.to_csv(f'{output_folder}result.csv', sep=',')
