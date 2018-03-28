@@ -16,6 +16,8 @@ class JewelleryBox():
         """ Add gem into box """
 
         if len(self.gems) >= self.max_size:
+            #min_gem = max(self.gems.keys(), key=lambda x: x.match_checks)
+            #del self.gems[min_gem]
             min_gem = min(self.gems.keys(), key=lambda x: x.value)
             if min_gem.value < gem.value:
                 del self.gems[min_gem]

@@ -5,12 +5,11 @@ Includes:
     X: input vector
     y: target vector
 """
+from functools import reduce
 from math import log as olog
 from math import sin as osin
 from math import cos as ocos
 
-from sklearn.metrics import mean_squared_error
-import numpy as np
 def add(x, y):
     return x + y
 
@@ -36,31 +35,32 @@ def sin(x):
 def cos(x):
     return ocos(x)
 
-FUNSET = {}
-FUNSET[0] = add
-FUNSET[1] = mul
-FUNSET[2] = pdiv 
-FUNSET[3] = sub 
-FUNSET[4] = plog 
-FUNSET[5] = sin 
-FUNSET[6] = cos 
+funset = {}
+funset[0] = add
+funset[1] = mul
+funset[2] = pdiv 
+funset[3] = sub 
+funset[4] = plog 
+funset[5] = sin 
+funset[6] = cos 
 
-PARAMS = {
-    'n_inputs': 1,
-    'n_outputs': 1,
-    'n_rows': 1,
-    'n_cols': 10,
-    'funset': FUNSET
-}
+def square(acc, ys):
+    return acc + (ys[0] - ys[1][0])**2
 
-EV_PARAMS = {
-    'cost_func': mean_squared_error,
-    'target_fitness': 0
-}
+def mean_squared_error(y_pred, y_true):
+    return reduce(square, zip(y_pred, y_true), 0)/len(y_pred)
 
 def target_function(x):
     return osin(x**2) + osin(x + x**2)
 
-X = np.arange(-5,5,0.1)
-y = [target_function(x) for x in  X]
-X = X.reshape(-1,1)
+X = [x/10 for x in range(-50,50)]
+y = [target_function(x) for x in X]
+X = [[x] for x in X]
+
+cost_func = mean_squared_error
+
+target_fitness = 0
+
+__all__ = [
+    'funset', 'cost_func', 'target_fitness', 'X', 'y'
+]

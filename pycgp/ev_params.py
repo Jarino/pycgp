@@ -23,7 +23,7 @@ class EvParams():
         self.selection = truncation_selection
         self.population_size = population_size
         self.gems_box_size = gems_box_size
-        self.gem_expire = 30
+        self.gem_expire = gem_expire
         self.gem_match_strategy = gem_match_strategy      
         self.max_evaluations = max_evaluations
         self.fitness_of_invalid = fitness_of_invalid

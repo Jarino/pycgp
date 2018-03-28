@@ -5,26 +5,34 @@ Inludes:
     X: input vector
     y: target vector
 """
+import os
+import pickle
 from math import log as olog
 from math import sin as osin
 from math import cos as ocos
+from math import exp
 
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
-from scipy.special import expit
-from sklearn.metrics import accuracy_score
-import numpy as np
 
-data = load_breast_cancer(return_X_y=True)
-X = data[0]
-y = data[1]
+def safe_sigmoid(x):
+    return 1 / (1 + exp(-x))
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
 
-def class_cost_function(target, output):
-    return -accuracy_score(target, np.round(expit(output)))
+base_path = os.path.dirname(__file__)
+
+names = ['X_train', 'X_test', 'y_train', 'y_test']
+# just so linter wouldn't bitch about nonexistent variables
+X_train = X_test = y_train = y_test = None
+
+for name in names:
+    path = os.path.join(base_path, 'bin_class_' + name)
+
+    with open(path, 'rb') as f:
+        data = pickle.load(f)
+
+    exec('{} = data'.format(name))
+
+#def class_cost_function(target, output):
+#    return -accuracy_score(target, np.round(expit(output)))
 
 def add(x, y):
     return x + y
@@ -51,25 +59,24 @@ def sin(x):
 def cos(x):
     return ocos(x)
 
-FUNSET = {}
-FUNSET[0] = add
-FUNSET[1] = mul
-FUNSET[2] = pdiv 
-FUNSET[3] = sub 
-FUNSET[4] = plog 
-FUNSET[5] = sin 
-FUNSET[6] = cos 
+funset = {}
+funset[0] = add
+funset[1] = mul
+funset[2] = pdiv 
+funset[3] = sub 
+funset[4] = plog 
+funset[5] = sin 
+funset[6] = cos 
 
-PARAMS = {
-    'n_inputs': 30,
-    'n_outputs': 1,
-    'n_cols': 10,
-    'arity': 2,
-    'n_rows': 1,
-    'funset': FUNSET
-}
+def cost_func(target, output):
+    # P - number of 1s in output 
+    # N - number of 0s in output
+    # TP - number of 1s in both target and output
+    # TN - number of 0s in both target and output
+    output = [0 if x[0] <= 0 else 1 for x in output]
 
-EV_PARAMS = {
-    'cost_func': class_cost_function,
-    'target_fitness': -1
-}
+    return -len([1 for t, o in zip(target, output) if t == o])/len(target)
+
+__all__ = [
+    'cost_func', 'X_train', 'X_test', 'y_train', 'y_test', 'funset'
+]
