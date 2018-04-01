@@ -26,12 +26,15 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
     j_box = JewelleryBox(ev_params.gem_match_strategy(), max_size=apply_gem)
     stats = initialize_stats_dict([
         ('mean_of_generation', []),
+        ('median_of_generation', []),
         ('std_of_generation', []),
         ('best_of_generation', []),
         ('best', None),
         ('gem_better_after', 0),
+        ('ga_values', []),
         ('gem_worse_after', 0)
-    ]) 
+    ])
+    print('heeeeej') 
     evaluations_counter = 0
     Counter.get().dict['gems'] = []
 
@@ -49,7 +52,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
    
     gens = 0
 
-    while evaluations_counter < ev_params.max_evaluations:
+    while evaluations_counter < ev_params.max_evaluations:#gens < 5000:
         gens += 1
 
 
@@ -60,9 +63,19 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
             fitness_values
         ))
 
-        stats['std_of_generation'].append(statistics.stdev(
+        stats['median_of_generation'].append(statistics.median(
             fitness_values
         ))
+
+        try:
+            stats['std_of_generation'].append(statistics.stdev(
+                fitness_values
+            ))
+        except OverflowError as e:
+            # just append last one as a fallback
+            stats['std_of_generation'].append(stats['std_of_generation'][-1])
+        
+        
 
         # store the best individual of population
         stats['best_of_generation'].append(min(
@@ -131,6 +144,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                             new_individual.fitness = ev_params.fitness_of_invalid # arbitrary large penalty 
                         evaluations_counter += 1
                         
+                        stats['ga_values'].append((matching_gem.value, new_individual.fitness, individual.fitness))
                         if new_individual.fitness < individual.fitness:
                             stats['gem_better_after'] += 1
                             population[index] = new_individual
@@ -159,9 +173,17 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         fitness_values
     ))
 
-    stats['std_of_generation'].append(statistics.mean(
+    stats['median_of_generation'].append(statistics.median(
         fitness_values
     ))
+
+    try:
+        stats['std_of_generation'].append(statistics.stdev(
+            fitness_values
+        ))
+    except OverflowError as e:
+        # just append last one as a fallback
+        stats['std_of_generation'].append(stats['std_of_generation'][-1])
 
     # store the best individual of population
     stats['best_of_generation'].append(min(

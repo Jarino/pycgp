@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
+
 def load_data(file, minimization=True, has_test_error=False):
     """
     Load data from Pickle dump
@@ -32,6 +34,7 @@ def load_data(file, minimization=True, has_test_error=False):
     
     best_fitness = [x['best_fitness'] for x in data]
     mean_fitness = [x['mean_of_generation'] for x in data]
+   # median_fitness = [x['median_of_generation'] for x in data]
     std_fitness  = [x['std_of_generation'] for x in data]
     gems_count   = [len(x['gem_data']) for x in data]
     gem_better   = [x['gem_better_after'] for x in data]
@@ -40,7 +43,7 @@ def load_data(file, minimization=True, has_test_error=False):
     if has_test_error:
         test_error = [x['test_error'] for x in data]
     
-    for measurement in [best_fitness, mean_fitness]:
+    for measurement in [best_fitness, mean_fitness, std_fitness]:
         longest = max([len(x) for x in measurement]) # since we know its only 2D its faster than np.max
         for l in measurement:
             extension = [l[-1]] * (longest - len(l))
@@ -48,9 +51,10 @@ def load_data(file, minimization=True, has_test_error=False):
     
     iob = np.unravel_index(argmin_fn(best_fitness), np.array(best_fitness).shape)
     agg = [
-        min_fn(best_fitness),
-        mean_fitness[iob[0]][iob[1]],
-        std_fitness[iob[0]][iob[1]],
+        np.mean(min_fn(best_fitness, axis=1)),
+        np.mean(mean_fitness, axis=0)[-1],
+      #  np.mean(median_fitness, axis=0)[-1],
+        np.mean(std_fitness, axis=0)[-1],
         np.mean(gems_count),
         np.mean(gem_better),
         np.mean(gem_worse)
@@ -83,7 +87,7 @@ def aggregate_statistics(folder, mutations, has_test_error=False):
     mf = []
 
     for index, ((mutation, strategy), gem, column) in enumerate(product(mutations, gems, columns)):
-        file = os.path.join(folder,  f'bin_class_out{mutation.__name__}-{strategy.__name__}-gems{gem}-n_cols{column}.csv')
+        file = os.path.join(folder,  f'{mutation.__name__}-{strategy.__name__}-gems{gem}-n_cols{column}.csv')
 
         row = [mutation.__name__, strategy.__name__, gem, column]
 
@@ -105,7 +109,7 @@ def plot_fitnesses(data, mutation_type, ylim):
     plt_data['gems'] = prob_data['gems'].values
 
     fig, ax = plt.subplots(1,2)
-    plt_data.groupby('gems').min().T.plot(ax=ax[0])
+    plt_data.groupby('gems').mean().T.plot(ax=ax[0])
     plt_data.groupby('gems').max().T.plot(ax=ax[1])
     ax[0].set_ylim(*ax[1].set_ylim(*ylim))
     ax[0].set_title('best run')
@@ -132,4 +136,6 @@ def plot_distributions(folder, mutations):
 
 
     for x in [0, 5, 10]:
-        sns.kdeplot(hist_data[hist_data.gems==x]['best'], label=x, shade=True)
+        ax = sns.kdeplot(hist_data[hist_data.gems==x]['best'], label=x, shade=True)
+        
+    return ax
