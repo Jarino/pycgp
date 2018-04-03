@@ -31,6 +31,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         ('best_of_generation', []),
         ('best', None),
         ('gem_better_after', 0),
+        ('gem_same_after', 0),
         ('ga_values', []),
         ('gem_worse_after', 0)
     ])
@@ -145,13 +146,15 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         evaluations_counter += 1
                         
                         stats['ga_values'].append((matching_gem.value, new_individual.fitness, individual.fitness))
-                        if new_individual.fitness < individual.fitness:
+                        if new_individual.fitness <= individual.fitness:
                             stats['gem_better_after'] += 1
                             population[index] = new_individual
+                        elif new_individual.fitness == individual.fitness:
+                            stats['gem_same_after'] += 1
                         else:
                             stats['gem_worse_after'] += 1
                     
-                        population[index] = new_individual
+                        #population[index] = new_individual
 
 
         population = population + [parent]

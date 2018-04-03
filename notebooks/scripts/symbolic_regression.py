@@ -26,7 +26,8 @@ gems_range = [5, 10]
 n_cols_range = [10, 50, 100]
 
 experiment_loop(
-    'symbolic_basic',
+    'or_symbolic_basic_equal',
+
     mutations,
     n_cols_range,
     gems_range,

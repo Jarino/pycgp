@@ -58,7 +58,7 @@ class GemMultipleGenes(Gem):
             mul, [child.bounds[m] + 1 for m in m_indices], 1)
 
         all_posibilities = reduce(mul, map(add_one, child.bounds), 1)
-        self.match_probability = (1/all_posibilities)*self.gene_possible_values
+        self.match_probability = (1/all_posibilities)#*self.gene_possible_values
 
     def apply(self, individual: Individual) -> Individual:
         self.n_uses += 1
@@ -91,7 +91,7 @@ class GemSingleGene(Gem):
         self.gene_possible_values = child.bounds[m_index] + 1
 
         all_posibilities = reduce(mul, map(add_one, child.bounds), 1)
-        self.match_probability = (1/all_posibilities)*self.gene_possible_values
+        self.match_probability = (1/all_posibilities)#*self.gene_possible_values
 
     def apply(self, individual: Individual) -> Individual:
         if individual.active_genes[self.index] == 0:
