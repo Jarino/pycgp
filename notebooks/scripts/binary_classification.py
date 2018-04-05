@@ -12,7 +12,7 @@ from pycgp.benchmarks.classification import *
 
 experiment_count = 0
 
-output_folder = 'bin_class_out'
+output_folder = 'bin_class_out_correct'
 
 mutations = [
         (point_mutation, MatchPMStrategy),
