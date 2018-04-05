@@ -21,7 +21,7 @@ mutations = [
         (probabilistic_mutation, MatchSMStrategy),
         (probabilistic_mutation, MatchByActiveStrategy)]
 
-gems_range = [5, 10]
+gems_range = [0, 5, 10]
 n_cols_range = [10, 50, 100]
 
 experiment_loop(

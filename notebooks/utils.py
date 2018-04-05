@@ -7,135 +7,115 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from pycgp import probabilistic_mutation, point_mutation, single_mutation
+from pycgp.gems import MatchByActiveStrategy, MatchSMStrategy, MatchPMStrategy
+
+class DataIterator():
+    def __init__(self, folder):
+        self.mutations = [
+          #  (probabilistic_mutation, MatchSMStrategy),
+            (point_mutation, MatchPMStrategy),
+            (single_mutation, MatchSMStrategy),
+            (single_mutation, MatchByActiveStrategy),
+            (probabilistic_mutation, MatchByActiveStrategy)
+        ]
+        self.gems = [5, 10]
+        
+        self.cols = [10, 50, 100]
+        
+        data = []
+        for m,s,g,c,dd in self.__iterate_folder(folder):
+            data.append([m, s, g, c, [x['ga_values'] for x in dd]])
+        data = pd.DataFrame(data)
+        data.columns = ['m', 's', 'g', 'c', 'gem_data']
+        self.data = data      
+    
+    def __iterate_folder(self,folder):
+        for index, ((mutation, strategy), gem, column) in enumerate(product(self.mutations, self.gems, self.cols)):
+            file = os.path.join(folder,  f'{mutation.__name__}-{strategy.__name__}-gems{gem}-n_cols{column}.csv')
+            with open (file, 'rb') as fp:
+                data = pickle.load(fp)
+
+                yield mutation.__name__, strategy.__name__, gem, column, data
+    
+    def iterate_gem_data(self, mutation, strategy, axis=False):
+        gdatas = self.data[(self.data.m == mutation) & (self.data.s == strategy) & (self.data.g != 0)]
+
+        if axis:
+            _, axs = plt.subplots(2, len(gdatas)//2, figsize=(8,6))
+
+        for i, (_, gdata) in enumerate(gdatas.iterrows()):
+            pgdata = []
+            #pdb.set_trace()
+            for gem in [item for sublist in gdata.gem_data for item in sublist]:
+                row = [gdata.g, gdata.c, gdata.g, gdata.c, gem.match_checks, gem.match_count, gem.n_uses, gem.value, gem.match_probability, gdata.better_after, gdata.worse_after, gdata.safe_after, gem[0], gem[1], gem[2]]
+                pgdata.append(row)
+
+            pgdata = pd.DataFrame(pgdata)
+            pgdata.columns = ['gems', 'columns', 'match_checks', 'match_count', 'n_uses', 'value', 'match_probability', 'better_after', 'worse_after', 'same_after', 'stored_value', 'new_value', 'old_value']
+            pgdata['gain'] = pgdata['old_value'] - pgdata['new_value']
+            pgdata['success_rate_counts'] = pgdata.n_uses / pgdata.match_count
+            pgdata['success_rate_checks'] = pgdata.n_uses / pgdata.match_checks
+            
+            if axis:
+                yield pgdata, axs[i//3][i%3]
+            else:
+                yield pgdata, None
+    
+    def stats(self):
+        frames = []
+        for m, s in self.mutations:
+            for pgdata, _ in self.iterate_gem_data(m.__name__, s.__name__):
+                pgdata['m'] = m.__name__
+                pgdata['s'] = s.__name__
+                frames.append(pgdata)
+        data = pd.concat(frames)
+        return data
+
+#import pdb
+            
+
+#symreg = DataIterator('scripts/symbolic_basic/')
 
 
-def load_data(file, minimization=True, has_test_error=False):
-    """
-    Load data from Pickle dump
-    Returns raw measurement data, agg list, best_fitness vectors, mean_fitness vectors
-    agg list contains:
-    - best of all, 
-    - mean fitness of generation with best
-    - std fitness of generation with best
-    - mean count of gems created
-    
-    """
-    if minimization:
-        argmin_fn = np.argmin
-        min_fn = np.min
-    else:
-        argmin_fn = np.argmax
-        min_fn = np.max
-    
-    with open (file, 'rb') as fp:
-        data = pickle.load(fp)
+def density_plots(folder, value_gttr):
+    best = []
 
-   # print(data[0].keys())
+    for raw in iterate_folder(folder):
+            m, s, g, c, data = raw
+            best.append([g, m, s] + [value_gttr(x) for x in data])
+
+    df = pd.DataFrame(best)
+    df.columns = ['gems', 'mutation', 'strategy', *list(range(1,21))]
+
+    _, axs = plt.subplots(1,3, figsize=(12,3))
+
+    choices = [
+        (point_mutation.__name__, MatchPMStrategy.__name__),
+        (single_mutation.__name__, MatchSMStrategy.__name__),
+        (probabilistic_mutation.__name__, MatchByActiveStrategy.__name__)
+    ]
+
+    titles = ['Point mutation', 'Single mutation', 'Probabilistic mutation']
     
-    best_fitness = [x['best_fitness'] for x in data]
-    mean_fitness = [x['mean_of_generation'] for x in data]
-   # median_fitness = [x['median_of_generation'] for x in data]
-    std_fitness  = [x['std_of_generation'] for x in data]
-    gems_count   = [len(x['gem_data']) for x in data]
-    gem_better   = [x['gem_better_after'] for x in data]
-    gem_worse    = [x['gem_worse_after'] for x in data]
-    
-    if has_test_error:
-        test_error = [x['test_error'] for x in data]
-    
-    for measurement in [best_fitness, mean_fitness, std_fitness]:
-        longest = max([len(x) for x in measurement]) # since we know its only 2D its faster than np.max
-        for l in measurement:
-            extension = [l[-1]] * (longest - len(l))
-            l.extend(extension)
-    
-    iob = np.unravel_index(argmin_fn(best_fitness), np.array(best_fitness).shape)
-    agg = [
-        np.mean(min_fn(best_fitness, axis=1)),
-        np.mean(mean_fitness, axis=0)[-1],
-      #  np.mean(median_fitness, axis=0)[-1],
-        np.mean(std_fitness, axis=0)[-1],
-        np.mean(gems_count),
-        np.mean(gem_better),
-        np.mean(gem_worse)
+    ylims = [
+        (0, 20), (0, 20), (0, 20)
     ]
     
-    if has_test_error:
-        agg.append(test_error[iob[0]])
-    
-        
-    return data, agg, best_fitness, mean_fitness
-
-
-def aggregate_statistics(folder, mutations, has_test_error=False):
-    """
-    Create aggregate dataframe for data files in given folder
-    Mutations is a list of tuples specifying which files should be loaded
-    """
-    gems = [0, 5, 10]
-    columns = [10, 50, 100]
-
-    column_names = ['mutation', 'strategy', 'gems', 'columns','best', 'mean', 'std', 'avg_gem_count', 'gem_better', 'gem_worse']
-    
-    if has_test_error:
-        column_names.append('test_error')
-        
-    column_names += ['bf', 'mf']
-
-    data = pd.DataFrame(columns=column_names)
-    bf = []
-    mf = []
-
-    for index, ((mutation, strategy), gem, column) in enumerate(product(mutations, gems, columns)):
-        file = os.path.join(folder,  f'{mutation.__name__}-{strategy.__name__}-gems{gem}-n_cols{column}.csv')
-
-        row = [mutation.__name__, strategy.__name__, gem, column]
-
-        raw, agg, best_fitness, mean_fitness = load_data(file, has_test_error=has_test_error)
-
-        row += [*agg, np.mean(best_fitness, axis=0), np.mean(mean_fitness, axis=0)]
-        
-        data.loc[index] = row
-
-    return data
-
-
-def plot_fitnesses(data, mutation_type, ylim):
-    """
-    Plot the fitnesses grouped by gems count
-    """
-    prob_data = data[data['mutation'] == mutation_type][['gems','bf']]
-    plt_data = pd.DataFrame([*prob_data['bf']])
-    plt_data['gems'] = prob_data['gems'].values
-
-    fig, ax = plt.subplots(1,2)
-    plt_data.groupby('gems').mean().T.plot(ax=ax[0])
-    plt_data.groupby('gems').max().T.plot(ax=ax[1])
-    ax[0].set_ylim(*ax[1].set_ylim(*ylim))
-    ax[0].set_title('best run')
-    ax[1].set_title('mean of all runs')
-    fig.suptitle(mutation_type);
-    
-def plot_distributions(folder, mutations):    
-    gems = [0,5,10]
-    columns = [10,50,100]
-
-    hist_data = []
-    names = []
-
-    for index, ((mutation, strategy), gem, column) in enumerate(product(mutations, gems, columns)):
-        file = os.path.join(folder,  f'{mutation.__name__}-{strategy.__name__}-gems{gem}-n_cols{column}.csv')
-        raw, _, _, _ = load_data(file)
-
-        [hist_data.append([gem, x['best'].fitness]) for x in raw]
-
-
-    hist_data = pd.DataFrame(hist_data)
-    hist_data
-    hist_data.columns = ['gems', 'best']
-
-
-    for x in [0, 5, 10]:
-        ax = sns.kdeplot(hist_data[hist_data.gems==x]['best'], label=x, shade=True)
-        
-    return ax
+    for i, (m, s) in enumerate(choices):
+        avgs = []
+        nonzero = []
+        for g in gems:
+            d = df[(df.mutation == m) & (df.strategy == s)]
+            values = d.iloc[:,3:][d.gems == g].values.flatten()
+            sns.kdeplot(values, ax=axs[i], label=g, shade=True)
+            avgs.append(np.mean(values)*100)
+            nonzero.append(np.count_nonzero(values == 0))
+            
+        axs[i].set_title('{}\n{}\n0 - {:3f}, {}\n5 - {:3f}, {}\n10 - {:3f}, {}'.format(m,s,avgs[0], nonzero[0], avgs[1], nonzero[1], avgs[2], nonzero[2]))
+        print('{}\n{}\n0 - {:3f}, {}\n5 - {:3f}, {}\n10 - {:3f}, {}'.format(m,s,avgs[0], nonzero[0], avgs[1], nonzero[1], avgs[2], nonzero[2]))
+        axs[i].set_title(titles[i])
+        axs[i].set_xlabel('Accuracy score')
+        axs[i].set_ylim(ylims[i])
+        axs[i].set_xlim(0.75, 1)
+    print(df.groupby('gems').median().mean(axis=1))

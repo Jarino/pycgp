@@ -35,7 +35,6 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         ('ga_values', []),
         ('gem_worse_after', 0)
     ])
-    print('heeeeej') 
     evaluations_counter = 0
     Counter.get().dict['gems'] = []
 
@@ -154,7 +153,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         else:
                             stats['gem_worse_after'] += 1
                     
-                        #population[index] = new_individual
+                        population[index] = new_individual
 
 
         population = population + [parent]
