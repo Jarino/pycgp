@@ -14,6 +14,7 @@ class Node(ABC):
 
 class InputNode(Node):
     def __init__(self, index):
+        self.genes = []
         super().__init__(index)
 
     def __str__(self):

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from pycgp.gems import GemPheno, GemSingleGene, GemMultipleGenes
 from pycgp.individual import Individual
 
+
 class MatchStrategy(ABC):
     @abstractmethod
     def match(self, gem, individual):
@@ -10,7 +11,11 @@ class MatchStrategy(ABC):
 class MatchPhenotypeStrategy(MatchStrategy):
     associated_gem_type = GemPheno
     def match(self, gem: GemPheno, individual: Individual):
-        return individual.nodes[gem.node_index].genes == gem.genes
+        for node in gem.parents_nodes:
+            index = node.id
+            if individual.nodes[index].genes != node.genes:
+                return False
+        return True 
 
 class MatchPMStrategy(MatchStrategy):
     associated_gem_type = GemSingleGene

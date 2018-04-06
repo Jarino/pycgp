@@ -1,5 +1,4 @@
 """ Individual """
-from copy import deepcopy
 from inspect import signature
 from itertools import compress
 
@@ -8,10 +7,7 @@ import numpy as np
 from pycgp.graph_iterator import iterate_active_nodes
 from pycgp.mapper import map_to_phenotype
 from pycgp.node import FunctionNode, InputNode, OutputNode
-from pycgp.utils import split_to_chunks
-from pycgp.counter import Counter
 
-import pdb
 
 class Individual():
     def __init__(self, genes, bounds, params):

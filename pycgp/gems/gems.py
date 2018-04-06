@@ -1,8 +1,7 @@
 """ Module containing classes for Gems extension """
 
 from pycgp.individual import Individual
-from pycgp.counter import Counter
-
+from pycgp.node import OutputNode
 
 from abc import ABC, abstractmethod
 
@@ -19,15 +18,20 @@ class Gem(ABC):
         pass
 
 class GemPheno(Gem):
+    '''Gem for parent phenotype match strategy''' 
     def __init__(self, child: Individual, parent: Individual, m_index: int) -> None:
-        self.mutated = child.genes[m_index]
-        self.node_index = m_index//(child.params['arity'] + 1) + child.params['n_inputs']
-        self.gene_index = m_index
-        self.value = parent.fitness - child.fitness
-        self.genes = parent.nodes[self.node_index].genes
-        self.digits = [*self.genes, m_index, self.mutated]
-        
+        # store genes of parents of given child node
+        self.mutated_node = child.node_of_gene(m_index)
+        self.parents_nodes = []
 
+        if isinstance(self.mutated_node, OutputNode):
+            input_genes = self.mutated_node.genes[:]
+        else:
+            input_genes = self.mutated_node.genes[1:]
+
+        for parent_index in input_genes:
+            self.parents_nodes.append(
+                child.nodes[parent_index])
 
     def apply(self, individual: Individual) -> Individual:
         new_genes = individual.genes[:]

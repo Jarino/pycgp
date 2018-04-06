@@ -1,12 +1,7 @@
 from pycgp.individual_builder import IndividualBuilder
-from pycgp.gems import JewelleryBox, GemSingleGene, MatchPMStrategy
-from pycgp.selection import truncation_selection
-from pycgp.mutation import point_mutation, probabilistic_mutation
+from pycgp.gems import JewelleryBox
 
 import statistics
-import pdb
-
-from pycgp.individual import Individual
 
 
 def initialize_stats_dict(tuples_with_init):
@@ -14,6 +9,7 @@ def initialize_stats_dict(tuples_with_init):
     for key, init in tuples_with_init:
         stats[key] = init
     return stats
+
 
 def evolution(cgp_params, ev_params, X, y, verbose=False):
     """
@@ -30,24 +26,22 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
         ('best', None),
         ('gem_better_after', 0),
         ('gem_worse_after', 0)
-    ]) 
+    ])
     evaluations_counter = 0
 
     population = [builder.build() for _ in range(0, ev_params.population_size)]
 
-    stats['best'] = population[0] # doesn't matter which one
+    stats['best'] = population[0]  # doesn't matter which one
 
     for individual in population:
         output = individual.execute(X)
         individual.fitness = ev_params.cost_function(y, output)
         evaluations_counter += 1
-   
+
     gens = 0
 
     while evaluations_counter < ev_params.max_evaluations:
         gens += 1
-
-
 
         # store mean of population and best individual
         stats['mean_of_generation'].append(statistics.mean(
