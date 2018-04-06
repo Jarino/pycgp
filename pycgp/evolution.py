@@ -8,6 +8,7 @@ import pdb
 
 from pycgp.individual import Individual
 
+
 def initialize_stats_dict(tuples_with_init):
     stats = {}
     for key, init in tuples_with_init:

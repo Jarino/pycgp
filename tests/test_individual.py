@@ -106,3 +106,20 @@ class TestIndividual(object):
 
         assert len(individual.output_nodes) == 4
 
+    def test_getting_a_node_of_gene(self, individual):
+
+        node = individual.node_of_gene(1) 
+        assert node.genes == [1, 0, 0]
+
+        node = individual.node_of_gene(0)
+        assert node.genes == [1, 0, 0]
+
+        node = individual.node_of_gene(6)
+        assert node.genes == [0, 4, 2]
+
+        node = individual.node_of_gene(11) 
+        assert node.genes == [2, 3, 1]
+
+        node = individual.node_of_gene(12)
+        assert node.genes == [6] 
+

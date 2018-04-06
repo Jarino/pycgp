@@ -72,6 +72,14 @@ class Individual():
         self.active_genes_vector = agenes
         return agenes
 
+    def node_of_gene(self, gene_index):
+        """ Return a full node which contains gene of given index """
+        node_index = gene_index // (self.params.arity + 1)
+
+        node_index += self.params.n_inputs
+
+        return self.nodes[node_index]
+
     def __mark_active(self):
         """ Mark nodes which are active and need to be computed """
         for node in iterate_active_nodes(self):
