@@ -145,7 +145,7 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                         evaluations_counter += 1
                         
                         stats['ga_values'].append((matching_gem.value, new_individual.fitness, individual.fitness))
-                        if new_individual.fitness <= individual.fitness:
+                        if new_individual.fitness < individual.fitness:
                             stats['gem_better_after'] += 1
                             population[index] = new_individual
                         elif new_individual.fitness == individual.fitness:

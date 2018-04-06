@@ -22,12 +22,11 @@ mutations = [
         (single_mutation, MatchByActiveStrategy),
         (probabilistic_mutation, MatchByActiveStrategy)]
 
-gems_range = [5, 10]
+gems_range = [0, 5, 10]
 n_cols_range = [10, 50, 100]
 
 experiment_loop(
-    'or_symbolic_basic_equal',
-
+    'symbolic_out',
     mutations,
     n_cols_range,
     gems_range,
