@@ -2,7 +2,7 @@
 
 from pycgp.individual import Individual
 from pycgp.node import OutputNode
-
+import ipdb
 from abc import ABC, abstractmethod
 
 class Gem(ABC):
@@ -22,7 +22,13 @@ class GemPheno(Gem):
     def __init__(self, child: Individual, parent: Individual, m_index: int) -> None:
         # store genes of parents of given child node
         self.mutated_node = child.node_of_gene(m_index)
+        self.mutated_gene = child.genes[m_index]
+        self.first_gene_index = (self.mutated_node.id - child.params.n_inputs) * (child.params.arity + 1)
+        self.gene_index = m_index
         self.parents_nodes = []
+        self.value = parent.fitness - child.fitness
+        self.n_uses = 0
+        self.digits = [m_index]
 
         if isinstance(self.mutated_node, OutputNode):
             input_genes = self.mutated_node.genes[:]
@@ -32,10 +38,12 @@ class GemPheno(Gem):
         for parent_index in input_genes:
             self.parents_nodes.append(
                 child.nodes[parent_index])
+            self.digits += child.nodes[parent_index].genes
+            
 
     def apply(self, individual: Individual) -> Individual:
         new_genes = individual.genes[:]
-        new_genes[self.gene_index] = self.mutated
+        new_genes[self.first_gene_index:self.first_gene_index+len(self.mutated_node.genes)] = self.mutated_node.genes
         return Individual(new_genes, individual.bounds, individual.params)
         
 
