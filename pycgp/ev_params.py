@@ -7,6 +7,7 @@ class EvParams():
 
     def __init__(self, cost_function,
                 target_fitness=None,
+                fitness_of_invalid=1e100,
                 mutation=point_mutation,
                 mutation_probability=0.25,
                 selection=truncation_selection,
@@ -22,6 +23,7 @@ class EvParams():
         self.selection = truncation_selection
         self.population_size = population_size
         self.gems_box_size = gems_box_size
-        self.gem_expire = 30
+        self.gem_expire = gem_expire
         self.gem_match_strategy = gem_match_strategy      
         self.max_evaluations = max_evaluations
+        self.fitness_of_invalid = fitness_of_invalid

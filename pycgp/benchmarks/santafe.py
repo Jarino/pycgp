@@ -104,19 +104,10 @@ with open(path_to_file) as f:
     matrix, position = parse_matrix(f)
 simulator = AntSimulator(matrix, position, 1)
 
-FUNSET = {}
-FUNSET[0] = simulator.if_food_ahead
-FUNSET[1] = prog2
-FUNSET[2] = prog3
-
-PARAMS = {
-    'n_inputs': 3,
-    'n_outputs': 1,
-    'n_rows': 1,
-    'n_cols': 10,
-    'funset': FUNSET
-}
-
+funset = {}
+funset[0] = simulator.if_food_ahead
+funset[1] = prog2
+funset[2] = prog3
 
 X = [[simulator.move, simulator.turn_left, simulator.turn_right]]
 
@@ -128,9 +119,8 @@ def santafe_cost_function(_, machine):
     machine[0][0]()
     return -simulator.eaten
 
-EV_PARAMS = {
-    'cost_func': santafe_cost_function,
-    'target_fitness': -89
-}
+cost_func = santafe_cost_function
+target_fitness = -89
 
 
+__all__ = ['cost_func', 'X',  'target_fitness', 'funset']

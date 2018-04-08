@@ -1,8 +1,7 @@
 """ Individual """
 from inspect import signature
 from itertools import compress
-
-import numpy as np
+from collections import Iterable
 
 from pycgp.graph_iterator import iterate_active_nodes
 from pycgp.mapper import map_to_phenotype
@@ -96,7 +95,7 @@ class Individual():
 
     def execute(self, data):
         """ Execute the individual with given data """
-        if np.isscalar(data[0]):
+        if not isinstance(data[0], Iterable) or isinstance(data[0], str):
             return self.__execute_single(data)
         else:
             return self.__execute_many(data)

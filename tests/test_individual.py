@@ -1,5 +1,4 @@
 """ Test suite for CGP individual """
-
 from copy import deepcopy
 
 import numpy as np

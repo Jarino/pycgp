@@ -1,5 +1,6 @@
 """Test suite for EvParams class"""
 
+
 from pycgp import EvParams
 from pycgp.gems import MatchByActiveStrategy, GemMultipleGenes
 from pycgp.gems import MatchPMStrategy, GemSingleGene
@@ -10,6 +11,7 @@ def test_basic_creation():
     ev_params = EvParams(lambda x: x)
 
     assert True
+
 
 def test_associated_gem_type():
     """Should assign correct gem type to certain match strategy"""
