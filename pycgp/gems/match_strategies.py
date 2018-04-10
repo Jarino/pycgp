@@ -11,6 +11,8 @@ class MatchStrategy(ABC):
 class MatchPhenotypeStrategy(MatchStrategy):
     associated_gem_type = GemPheno
     def match(self, gem: GemPheno, individual: Individual):
+#        if individual.node_of_gene(gem.gene_index).genes != gem.original_node.genes:
+#            return False
         for node in gem.parents_nodes:
             index = node.id
             if individual.nodes[index].genes != node.genes:

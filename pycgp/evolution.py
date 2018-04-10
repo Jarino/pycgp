@@ -147,10 +147,11 @@ def evolution(cgp_params, ev_params, X, y, verbose=False):
                             population[index] = new_individual
                         elif new_individual.fitness == individual.fitness:
                             stats['gem_same_after'] += 1
+                            #population[index] = new_individual
                         else:
                             stats['gem_worse_after'] += 1
                     
-                        population[index] = new_individual
+                        #population[index] = new_individual
 
 
         population = population + [parent]

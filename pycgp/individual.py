@@ -48,6 +48,9 @@ class Individual():
         """ Return the list containing output genes as list of integers """
         return self.genes[-self.params.n_outputs:]
 
+    def dummy_output_genes(self):
+        pass
+
     @property
     def active_genes(self):
         """ Return a bit array indicating, whether gene at given position

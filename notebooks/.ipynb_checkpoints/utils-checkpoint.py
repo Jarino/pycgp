@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from pycgp import probabilistic_mutation, point_mutation, single_mutation
-from pycgp.gems import MatchByActiveStrategy, MatchSMStrategy, MatchPMStrategy
+from pycgp.gems import MatchByActiveStrategy, MatchSMStrategy, MatchPMStrategy, MatchPhenotypeStrategy
 
 class DataIterator():
     def __init__(self, folder):
@@ -17,7 +17,8 @@ class DataIterator():
             (point_mutation, MatchPMStrategy),
             (single_mutation, MatchSMStrategy),
             (single_mutation, MatchByActiveStrategy),
-            (probabilistic_mutation, MatchByActiveStrategy)
+            (probabilistic_mutation, MatchByActiveStrategy),
+            (point_mutation, MatchPhenotypeStrategy    )
         ]
         self.gems = [0, 5, 10]
         
