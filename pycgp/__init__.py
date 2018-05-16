@@ -2,3 +2,4 @@ from .mutation import point_mutation, probabilistic_mutation, active_mutation, s
 from .selection import truncation_selection
 from .ev_params import EvParams
 from .params import Params
+from .tabu_search import tabu_search
